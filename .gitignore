@@ -1,0 +1,6 @@
+/dist
+/test-builds
+coverage
+.vscode
+.cache
+/node_modules/.bin

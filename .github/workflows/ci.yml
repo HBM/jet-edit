@@ -1,0 +1,133 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+
+    - name: stylelint
+      run: npm run stylelint:ci
+
+    - name: prettier
+      run: npm run prettier:ci
+
+    - name: eslint
+      run: npm run eslint
+
+    - name: type check
+      run: npm run tsc
+
+    - name: test
+      run: npm test
+
+    - name: bundle
+      run: npm run bundle
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: bundle
+        path: dist
+
+    - name: delete existing release
+      if: github.ref == 'refs/heads/master'
+      run: |
+        curl \
+        --url https://api.github.com/repos/${{ github.repository }}/releases/tags/dev \
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | jq -r .id | xargs -I {} curl \
+        --request DELETE \
+        --url https://api.github.com/repos/${{ github.repository }}/releases/{} \
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+
+    # https://stackoverflow.com/questions/58257140/unable-to-commit-and-push-back-changes-made-by-github-action-invalid-user
+    # https://stackoverflow.com/questions/8044583/how-can-i-move-a-tag-on-a-git-branch-to-a-different-commit
+    - name: move dev tag
+      # move tag only on master branch
+      if: github.ref == 'refs/heads/master'
+      run: |
+        git config --global user.name 'bot'
+        git config --global user.email 'bot@hbkworld.com'
+        # delete old remote tag
+        git push origin :refs/tags/dev
+        # create tag again
+        git tag --force dev
+        # push to github
+        git push --tags
+
+    - name: zip bundle
+      if: github.ref == 'refs/heads/master'
+      run: |
+        zip -r jet-edit-dist.zip dist
+
+    - name: create release for dev tag
+      id: create_release
+      uses: actions/create-release@v1
+      if: github.ref == 'refs/heads/master'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: dev
+        release_name: dev
+        draft: false
+        prerelease: true
+
+    - name: build assets and upload to dev tag
+      if: github.ref == 'refs/heads/master'
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./jet-edit-dist.zip
+        asset_name: jet-edit-dist.zip
+        asset_content_type: application/zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@master
+
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+
+    - name: build bundle
+      run: |
+        npm run bundle
+        zip -r jet-edit-dist.zip dist
+    - name: create release / version
+      id: create_version
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: upload assets
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_version.outputs.upload_url }}
+        asset_path: ./jet-edit-dist.zip
+        asset_name: jet-edit-dist.zip
+        asset_content_type: application/zip

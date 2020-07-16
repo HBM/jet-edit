@@ -1,0 +1,40 @@
+@import "src/css/custom";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "src/css/header.scss";
+@import "src/css/navbarPanel";
+@import "src/css/split";
+
+// app
+body {
+  margin: 0;
+  background-color: $light;
+}
+
+#app {
+  display: grid;
+  grid-template-areas:
+    "top-bar"
+    "search-bar"
+    "main";
+  grid-template-columns: minmax(1fr, auto);
+}
+
+.main {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: 60%;
+  grid-template-areas: "split-left split-right";
+  height: 100vh;
+}
+
+@include media-breakpoint-up(sm) {
+  #app {
+    display: grid;
+    grid-template-areas:
+      "nav-panel top-bar"
+      "nav-panel search-bar"
+      "nav-panel main";
+    grid-template-columns: var(--navbar-width) auto;
+    grid-template-rows: max-content;
+  }
+}

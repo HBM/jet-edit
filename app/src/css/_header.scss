@@ -1,0 +1,20 @@
+.Header {
+  grid-area: top-bar;
+  background: var(--theme-Header);
+  color: var(--header-color);
+  fill: var(--header-color);
+  height: calc(var(--header-height) - 20px);
+  width: auto;
+  padding: 0;
+}
+
+@include media-breakpoint-up(sm) {
+  .Header {
+    height: var(--header-height);
+    padding: 0 12px;
+  }
+
+  .Header .navbar-menu {
+    display: none;
+  }
+}

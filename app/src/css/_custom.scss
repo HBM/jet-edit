@@ -1,0 +1,12 @@
+// Your variable overrides
+$body-bg: #000;
+$body-color: #111;
+
+:root {
+  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --theme-Header: #1b325f;
+  --header-color: #fff;
+  --navbar-width: 240px;
+  --header-height: 64px;
+  --subheader-height: 48px;
+}

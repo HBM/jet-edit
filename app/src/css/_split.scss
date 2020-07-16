@@ -1,0 +1,11 @@
+
+.Split-left {
+  grid-area: split-left;
+  padding: 1rem;
+  // box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.24);
+}
+
+.Split-right {
+  grid-area: split-right;
+  padding: 1rem;
+}

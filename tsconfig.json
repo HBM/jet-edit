@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    /* Basic/Project Options */
+    "target": "ESNext",
+    "module": "CommonJS",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    // "rootDir": "./src/",
+    "jsx": "react",
+    "allowJs": true,
+    "checkJs": true,
+
+    /* Strict Checks */
+    "strict": true,
+    "noImplicitAny": true,
+
+    /* Module Resolution */
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    /* Linter Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true
+  },
+  /* File Inclusion */
+  "include": ["app/**/*"]
+  // "exclude": ["node_modules"]
+}
