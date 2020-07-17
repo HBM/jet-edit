@@ -8,7 +8,7 @@ const MessageType = {
   info: 'Info'
 }
 
-export type ToastTypes = 'success' | 'warning' | 'danger' | 'info'
+export type ToastTypes = keyof typeof MessageType
 
 export interface ToastContext {
   show: (type: ToastTypes, text: string) => void
@@ -24,38 +24,37 @@ interface ToastProviderPropsTypes {
 }
 
 export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
-  const [items, setItems] = useState<Array<{ text: string; type: ToastTypes }>>(
-    []
-  )
+  const [toastItems, setToastItems] = useState<
+    Array<{ id: number; text: string; type: ToastTypes }>
+  >([])
 
   const context = {
-    show: (type: ToastTypes, value: string): void => {
-      setItems((it) => [{ text: value, type }, ...it])
-    }
+    show: (type: ToastTypes, message: string): void =>
+      setToastItems((it) => [
+        { id: performance.now(), text: message, type },
+        ...it
+      ])
   }
-  console.log('render', items)
   return (
     <ToastContext.Provider value={context}>
       {props.children}
-      {items.length > 0 ? (
+      {toastItems.length > 0 ? (
         <div
           style={{
             position: 'fixed',
-            minHeight: 200,
-            right: 20,
-            top: 20,
+            left: '50%',
+            bottom: 20,
+            transform: 'translate(-50%, 0%)',
             zIndex: 1060
           }}
         >
-          {items.map((it, index) => (
+          {toastItems.map((it) => (
             <Toast
-              key={index}
+              key={it.id}
               onClose={() =>
-                setItems((it) => {
-                  const newItems = it.slice()
-                  newItems.pop()
-                  return newItems
-                })
+                setToastItems((parts) =>
+                  parts.filter((partItem) => partItem.id !== it.id)
+                )
               }
               delay={props.timeout}
               autohide
@@ -64,7 +63,6 @@ export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
                 <strong className={`mr-auto text-${it.type}`}>
                   {MessageType[it.type]}
                 </strong>
-                <small>{Date.now()}</small>
               </Toast.Header>
               <Toast.Body>{it.text}</Toast.Body>
             </Toast>

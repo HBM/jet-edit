@@ -19,12 +19,20 @@ export const NavbarPanel = (props: NavbarPanelProps): JSX.Element => {
       </div>
       <nav className="nav flex-column">
         <NavLink
-          to={{ pathname: '/connections', state: { text: 'Connections' } }}
+          to={{ pathname: '/connections' }}
           className="nav-link"
           activeClassName="active"
           aria-current="page"
         >
           Connections
+        </NavLink>
+        <NavLink
+          to={{ pathname: '/search' }}
+          className="nav-link"
+          activeClassName="active"
+          aria-current="page"
+        >
+          Search
         </NavLink>
         {/* <a className="nav-link" href="#test">
           Search

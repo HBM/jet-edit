@@ -124,7 +124,14 @@ export const JetProvider = (props: JetProviderProps): JSX.Element => {
     connections: connections,
     conID: currConnID,
     peer: peer,
-    connectionFailure: (id): void => console.log('connection Failure', id),
+    connectionFailure: (id): void => {
+      const connection = connections[id]
+      const url = `${connection.ws.scheme}://${connection.ws.url}`
+      toastCTX.show(
+        'danger',
+        `Connection to '${url}' failed: Error in connection establishment`
+      )
+    },
     connectionRemove: async (index) => {
       if (currConnID === index) {
         if (peer) {
@@ -139,7 +146,6 @@ export const JetProvider = (props: JetProviderProps): JSX.Element => {
       setConnections([...connections, newConnection])
     },
     connect: (id, protocol, url, name, user, password) => {
-      toastCTX.show('info', 'start connect')
       connect(id, protocol, url, name, user, password)
         .then((ownPeer: JetPeerInterface) => {
           setPeer(ownPeer)
@@ -148,7 +154,7 @@ export const JetProvider = (props: JetProviderProps): JSX.Element => {
         })
         .catch(() => {
           setPeer(undefined)
-          toastCTX.show('danger', `#${id + 1}: ${url},connection failure`)
+          toastCTX.show('danger', 'Connection failure')
           console.log('connection failure')
         })
     },

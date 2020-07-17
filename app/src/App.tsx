@@ -1,9 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { Header } from './Header'
-import { Connections } from './Connections'
 import { JetProvider } from './contexts/Jet'
 import { ToastProvider } from './contexts/Toast'
+import { Connections } from './Connections'
+import { Search } from './Search'
 
 const Index = (): JSX.Element => {
   return (
@@ -13,6 +14,7 @@ const Index = (): JSX.Element => {
         <Switch>
           <Route exact path="/" component={Connections} />
           <Route path="/connections" component={Connections} />
+          <Route path="/search" component={Search} />
         </Switch>
       </div>
     </>
@@ -20,7 +22,7 @@ const Index = (): JSX.Element => {
 }
 
 const App = (): JSX.Element => (
-  <ToastProvider timeout={5000}>
+  <ToastProvider timeout={8000}>
     <JetProvider>
       <BrowserRouter>
         <Index />
