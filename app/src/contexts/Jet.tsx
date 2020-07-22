@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import jet from 'node-jet'
 import { ToastContext } from './Toast'
+import useLocalStorage from '../hooks/useLocalStorage'
 
 export interface JetPeerInterface {
   close: () => Promise<void>
@@ -79,8 +78,12 @@ interface JetProviderProps {
 }
 
 export const JetProvider = (props: JetProviderProps): JSX.Element => {
-  const [connections, setConnections] = useState<jetConnections>([])
-  const [currConnID, setCurrConnID] = useState(-1)
+  // const [connections, setConnections] = useState<jetConnections>([])
+  const [connections, setConnections] = useLocalStorage<jetConnections>(
+    'connections',
+    []
+  )
+  const [currConnID, setCurrConnID] = useLocalStorage('connectionID', -1)
   const [peer, setPeer] = useState<JetPeerInterface>()
   const toastCTX = useContext(ToastContext)
 

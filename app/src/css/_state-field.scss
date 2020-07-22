@@ -1,0 +1,4 @@
+.State-field + .State-field::before {
+  content: " - ";
+  margin-right: 4px;
+}

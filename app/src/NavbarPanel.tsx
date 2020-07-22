@@ -27,12 +27,12 @@ export const NavbarPanel = (props: NavbarPanelProps): JSX.Element => {
           Connections
         </NavLink>
         <NavLink
-          to={{ pathname: '/search' }}
+          to={{ pathname: '/browser' }}
           className="nav-link"
           activeClassName="active"
           aria-current="page"
         >
-          Search
+          Browser
         </NavLink>
         {/* <a className="nav-link" href="#test">
           Search

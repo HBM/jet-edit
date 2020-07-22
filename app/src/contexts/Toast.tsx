@@ -59,7 +59,7 @@ export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
               delay={props.timeout}
               autohide
             >
-              <Toast.Header>
+              <Toast.Header style={{ minWidth: 250 }}>
                 <strong className={`mr-auto text-${it.type}`}>
                   {MessageType[it.type]}
                 </strong>

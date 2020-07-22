@@ -4,17 +4,17 @@ import { Header } from './Header'
 import { JetProvider } from './contexts/Jet'
 import { ToastProvider } from './contexts/Toast'
 import { Connections } from './Connections'
-import { Search } from './Search'
+import { FetchBrowser } from './FetchBrowser'
 
 const Index = (): JSX.Element => {
   return (
     <>
       <Header />
-      <div className="main" role="main">
+      <div className="main mx-2 mt-2" role="main">
         <Switch>
           <Route exact path="/" component={Connections} />
           <Route path="/connections" component={Connections} />
-          <Route path="/search" component={Search} />
+          <Route path="/browser" component={FetchBrowser} />
         </Switch>
       </div>
     </>

@@ -12,7 +12,7 @@ export const Header = (): JSX.Element => {
 
   for (let i = 0; i < here.length; i++) {
     const part = here[i]
-    const [first, ...rest] = part
+    const [first, ...rest] = decodeURIComponent(part)
     const text = [first.toLocaleUpperCase(), ...rest].join('')
     const link = '/' + here.slice(0, i + 1).join('/')
     breadcrumpItems.push({ text: text, link: link })
