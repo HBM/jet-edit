@@ -4,6 +4,20 @@ import React, { useContext, useEffect, useState } from 'react'
 import { JetContext } from './contexts/Jet'
 import flatten from 'flat'
 import { NavLink } from 'react-router-dom'
+import { Search, AddCircle, RemoveCircle } from './SVG-Icons'
+
+const processString = (text: string): string => text.trim().toLowerCase()
+const matchSearch = (label: string, searchTerm: string): boolean => {
+  return processString(label).includes(processString(searchTerm))
+}
+
+const toggleTreeOpen = (data: treeItems, itemPath: string) => {
+  const findItem = data.find((it) => it.path === itemPath)
+  if (findItem) {
+    findItem.isOpen = !findItem.isOpen
+  }
+  return data
+}
 
 type treeItem = {
   path: string
@@ -18,7 +32,7 @@ type treeItems = Array<treeItem>
 interface AddListRowProps {
   data: treeItems
   show?: boolean
-  parent: string
+  searchTerm?: string
 }
 
 const adaptValue = (
@@ -55,89 +69,95 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
   }, [props.data])
 
   return (
-    <ul
+    <div
       className={classnames('list-group', {
-        'pl-4': props.show,
-        container: !props.show
+        'pl-4': props.show
       })}
     >
       {treeData.map((item) => {
         const count = item.items.length
         const hasChild = count > 0
         const path = item.path
+        const isSearch = !!props.searchTerm
+        const isOpen = item.isOpen || isSearch
         const isMethod = !hasChild && typeof item.value === 'undefined'
+        const isVisible =
+          !props.searchTerm ||
+          (isSearch && matchSearch(item.label, props.searchTerm))
         return (
           <React.Fragment key={path}>
-            <NavLink
-              to={{ pathname: `/browser/${encodeURIComponent(path)}` }}
-              role="button"
-              className={classnames(
-                'list-group-item d-flex justify-content-between align-items-center',
-                {
-                  'list-group-item-action': hasChild
-                }
-              )}
-              onClick={() => {
-                if (hasChild) {
-                  setTreeData((items) => deepShow(items, path))
-                }
-              }}
-            >
-              <div className="col-auto" style={{ minWidth: 38 }}>
-                {hasChild ? (
-                  <span
-                    className="badge bg-bg-transparent text-secondary mr-1"
-                    style={{ minWidth: 24 }}
-                  >
-                    {item.isOpen ? '-' : '+'}
-                  </span>
-                ) : null}
-              </div>
-              <div className="col">
-                <div className="font-weight-bold d-inline">{item.path}</div>
-                <span
-                  className="text-muted font-monospace font-weight-lighter text-truncate d-inline"
-                  style={{ fontSize: '0.8rem' }}
-                >
-                  {item.value && adaptValue(item.value)}
-                </span>
-              </div>
-              <div className="col-auto">
-                {hasChild ? (
-                  <span className="badge bg-secondary rounded-pill">
-                    {count}
-                  </span>
-                ) : isMethod ? (
-                  <span
-                    className="badge bg-warning bg-gradient"
-                    style={{ minWidth: 24 }}
-                    title="Method"
-                  >
-                    M
-                  </span>
-                ) : (
-                  <span
-                    className="badge bg-info bg-gradient"
-                    style={{ minWidth: 24 }}
-                    title="State"
-                  >
-                    S
-                  </span>
+            {isVisible ? (
+              <NavLink
+                to={{ pathname: `/browser/${encodeURIComponent(path)}` }}
+                role="button"
+                className={classnames(
+                  'list-group-item d-flex justify-content-between align-items-center',
+                  {
+                    'list-group-item-action': hasChild
+                  }
                 )}
-              </div>
-            </NavLink>
-            {item.isOpen ? (
+                onClick={() => {
+                  if (hasChild && !isSearch) {
+                    setTreeData((items) => toggleTreeOpen(items, path))
+                  }
+                }}
+              >
+                <div className="col-auto" style={{ minWidth: 38 }}>
+                  {hasChild && !isSearch ? (
+                    <span
+                      className="badge bg-bg-transparent text-secondary mr-1"
+                      style={{ minWidth: 24 }}
+                    >
+                      {item.isOpen ? <RemoveCircle /> : <AddCircle />}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="col">
+                  <div className="font-weight-bold d-inline">{item.path}</div>
+                  <span
+                    className="text-muted font-monospace font-weight-lighter text-truncate d-inline"
+                    style={{ fontSize: '0.8rem' }}
+                  >
+                    {item.value && adaptValue(item.value)}
+                  </span>
+                </div>
+                <div className="col-auto">
+                  {hasChild ? (
+                    <span className="badge bg-secondary rounded-pill">
+                      {count}
+                    </span>
+                  ) : isMethod ? (
+                    <span
+                      className="badge bg-warning bg-gradient"
+                      style={{ minWidth: 24 }}
+                      title="Method"
+                    >
+                      M
+                    </span>
+                  ) : (
+                    <span
+                      className="badge bg-info bg-gradient"
+                      style={{ minWidth: 24 }}
+                      title="State"
+                    >
+                      S
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            ) : null}
+            {isOpen ? (
               <AddListRow
                 key={`${path}-${count}`}
                 data={item.items}
                 show={item.isOpen}
-                parent={path}
+                searchTerm={props.searchTerm}
               />
             ) : null}
           </React.Fragment>
         )
       })}
-    </ul>
+    </div>
   )
 }
 
@@ -180,16 +200,34 @@ const addData = (
   return _last
 }
 
+const findPath = (
+  path: string,
+  index: number,
+  treeData: treeItems
+): boolean => {
+  const parts = path.split('/')
+  const it = parts.filter((_, i) => i <= index)
+  const findItem = treeData.find((item) => item.path === it.join('/'))
+  if (findItem && path === findItem.path && findItem.items.length === 0) {
+    console.log(path, findItem.path)
+    return true
+  }
+  if (findItem) {
+    return findPath(path, index + 1, findItem.items)
+  }
+  return false
+}
+
 export const FetchBrowser = (): JSX.Element => {
   const [treeData, setTreeData] = useState<treeItems>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const context = useContext(JetContext)
   const fetcher = new jet.Fetcher()
     .path('containsAllOf', [''])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on('data', (data: { path: string; value: string | number }) => {
-      console.log('fetch data')
       setTreeData((items) => {
-        return addData([...items], '', data.path.split('/'), data)
+        return addData(items, '', data.path.split('/'), data)
       })
     })
 
@@ -206,29 +244,41 @@ export const FetchBrowser = (): JSX.Element => {
     }
   }, [context.peer])
 
-  return (
-    <div className="h-auto">
-      <AddListRow data={treeData} parent="" />
-    </div>
-  )
-}
-
-const deepShow = (data: treeItems, itemPath: string) => {
-  const findItem = data.find((it) => it.path === itemPath)
-  if (findItem) {
-    findItem.isOpen = !findItem.isOpen
-  } else {
-    const parts = itemPath.split('/')
-    if (parts.length > 1) {
-      for (let index = 0; index < parts.length; index++) {
-        const part = parts[index]
-        const findItem = data.find((it) => it.path === part)
-        if (findItem) {
-          findItem.isOpen = !findItem.isOpen
-          break
-        }
-      }
-    }
+  const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.currentTarget.value)
   }
-  return data
+
+  return (
+    <>
+      <div className="Split-left">
+        <div className="input-group mb-3">
+          <span className="input-group-text">
+            <Search />
+          </span>
+          <input
+            type="search"
+            className="form-control"
+            aria-label="Type and search"
+            placeholder="Type and search"
+            onChange={onSearch}
+            value={searchTerm}
+          />
+        </div>
+        <AddListRow data={treeData} searchTerm={searchTerm} />
+      </div>
+      {/* <Route
+        path="/browser/:path"
+        children={({ match }) => {
+          if (
+            match &&
+            match.params.path &&
+            findPath(decodeURIComponent(match.params.path), 0, treeData)
+          ) {
+            return <div className="Split-right">{match.params.path}</div>
+          }
+          return <></>
+        }}
+      /> */}
+    </>
+  )
 }
