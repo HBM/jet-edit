@@ -8,18 +8,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checkout
+    - name: Checkout 🛎️
       uses: actions/checkout@v2
 
-    - name: setup node
+    - name: setup node 📦
       uses: actions/setup-node@v1
       with:
         node-version: '14.x'
 
-    - name: stylelint
+    - name: stylelint 📝
       run: npm run stylelint:ci
 
-    - name: prettier
+    - name: prettier 🆒
       run: npm run prettier:ci
 
     - name: eslint
@@ -28,13 +28,13 @@ jobs:
     - name: type check
       run: npm run tsc
 
-    - name: test
+    - name: test 🐝
       run: npm test
 
-    - name: bundle
+    - name: bundle 🔗
       run: npm run bundle
 
-    - name: Upload
+    - name: Upload 📁
       uses: actions/upload-artifact@v1
       with:
         name: bundle
@@ -84,7 +84,7 @@ jobs:
 
     - name: build assets and upload to dev tag
       if: github.ref == 'refs/heads/master'
-      uses: actions/upload-release-asset@v1.0.1
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -92,6 +92,13 @@ jobs:
         asset_path: ./jet-edit-dist.zip
         asset_name: jet-edit-dist.zip
         asset_content_type: application/zip
+    
+    - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.5.9
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: dist # The folder the action should deploy.
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
