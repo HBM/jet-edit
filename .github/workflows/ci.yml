@@ -15,6 +15,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '14.x'
+    
+    - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
+      run: npm install
 
     - name: stylelint 📝
       run: npm run stylelint:ci
@@ -22,14 +25,14 @@ jobs:
     - name: prettier 🆒
       run: npm run prettier:ci
 
-    - name: eslint
-      run: npm run eslint
+    # - name: eslint
+    #   run: npm run eslint
 
-    - name: type check
-      run: npm run tsc
+    # - name: type check
+    #   run: npm run tsc
 
-    - name: test 🐝
-      run: npm test
+    # - name: test 🐝
+    #   run: npm test
 
     - name: bundle 🔗
       run: npm run bundle
