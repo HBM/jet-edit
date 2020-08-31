@@ -1,17 +1,18 @@
 import React from 'react'
 import { HbmLogo } from './SVG-Icons'
 import { NavLink } from 'react-router-dom'
+import classnames from 'classnames'
 
 interface NavbarPanelProps {
   setShow: (show: boolean) => void
-  show?: string
+  show: boolean
 }
 
 export const NavbarPanel = (props: NavbarPanelProps): JSX.Element => {
   const onClose = (): void => props.setShow(false)
   return (
     <div
-      className={`NavbarPanel ${props.show ? 'Navbar-show' : ''}`}
+      className={classnames('NavbarPanel', { 'Navbar-show': props.show })}
       onClick={onClose}
     >
       <div className="Navbar-logo d-flex">

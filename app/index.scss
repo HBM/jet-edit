@@ -1,5 +1,6 @@
 @import "src/css/custom";
 @import "../node_modules/bootstrap/scss/bootstrap";
+@import "src/css/bootstrapFix";
 @import "src/css/header.scss";
 @import "src/css/navbarPanel";
 @import "src/css/split";
@@ -14,27 +15,31 @@ body {
   display: grid;
   grid-template-areas:
     "top-bar"
-    "search-bar"
     "main";
   grid-template-columns: minmax(1fr, auto);
+  grid-template-rows: min-content;
+  height: 100vh;
 }
 
 .main {
   grid-area: main;
   display: grid;
-  grid-template-columns: 60%;
-  grid-template-areas: "split-left split-right";
-  height: 100vh;
+  grid-template-areas: "split-left";
+  grid-template-columns: 100%;
+  overflow: auto;
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(lg) {
   #app {
-    display: grid;
     grid-template-areas:
       "nav-panel top-bar"
-      "nav-panel search-bar"
       "nav-panel main";
     grid-template-columns: var(--navbar-width) auto;
     grid-template-rows: max-content;
+  }
+
+  .main {
+    grid-template-columns: 60%;
+    grid-template-areas: "split-left split-right";
   }
 }

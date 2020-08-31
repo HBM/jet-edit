@@ -1,12 +1,6 @@
 import React, { useContext } from 'react'
 import { Connection } from './Connection'
-import {
-  Switch,
-  Route,
-  Redirect,
-  useRouteMatch,
-  useHistory
-} from 'react-router-dom'
+import { useRouteMatch, useHistory } from 'react-router-dom'
 import { JetContext } from './contexts/Jet'
 import { AddCircle, RemoveCircle } from './SVG-Icons'
 
@@ -109,8 +103,8 @@ export const Connections = (): JSX.Element => {
       <div className="Split-left">
         <div className="card-group">
           <div className="card">
-            <div className="card-header">
-              <div className="d-inline-block">{title}</div>{' '}
+            <div className="card-body sticky-top bg-white">
+              <h5 className="d-inline-block">{title}</h5>
               <button
                 type="button"
                 className="btn btn-sm float-right"
@@ -137,18 +131,7 @@ export const Connections = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <div className="Split-right">
-        <Switch>
-          <Route path="/connections/:id" exact strict>
-            <Connection />
-          </Route>
-          {connLength > 0 ? (
-            <Route path="/connections" exact strict>
-              <Redirect push to="connections/1" />
-            </Route>
-          ) : null}
-        </Switch>
-      </div>
+      <Connection />
     </>
   )
 }

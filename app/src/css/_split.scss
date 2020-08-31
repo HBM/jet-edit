@@ -2,10 +2,39 @@
 .Split-left {
   grid-area: split-left;
   padding: 1rem;
-  // box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.24);
 }
 
 .Split-right {
-  grid-area: split-right;
+  grid-area: split-left;
   padding: 1rem;
+}
+
+.Split-right::before {
+  content: '';
+  display: block;
+  background-color: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.Split-right--show {
+  width: 100%;
+  z-index: 1040;
+}
+
+@include media-breakpoint-up(lg) {
+  .Split-right {
+    grid-area: split-right;
+  }
+
+  .Split-right::before {
+    content: none;
+  }
+
+  .Split-right--show {
+    width: inherit;
+  }
 }

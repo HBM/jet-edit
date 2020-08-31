@@ -3,6 +3,12 @@ import jet from 'node-jet'
 import { ToastContext } from './Toast'
 import useLocalStorage from '../hooks/useLocalStorage'
 
+export interface JetData {
+  path: string
+  value: string | number
+  fetchOnly?: boolean
+}
+
 export interface JetPeerInterface {
   close: () => Promise<void>
   call: <T>(path: string, value: T) => Promise<void>

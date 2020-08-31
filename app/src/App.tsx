@@ -10,7 +10,7 @@ const Index = (): JSX.Element => {
   return (
     <>
       <Header />
-      <div className="main mx-2 mt-2" role="main">
+      <div className="main" role="main">
         <Switch>
           <Route exact path="/" component={Connections} />
           <Route path="/connections" component={Connections} />

@@ -1,10 +1,11 @@
 import jet from 'node-jet'
 import classnames from 'classnames'
-import React, { useContext, useEffect, useState } from 'react'
-import { JetContext } from './contexts/Jet'
 import flatten from 'flat'
-import { NavLink } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { NavLink, Route, Link } from 'react-router-dom'
+import { JetContext, JetData } from './contexts/Jet'
 import { Search, AddCircle, RemoveCircle } from './SVG-Icons'
+import { Details } from './Details'
 
 const processString = (text: string): string => text.trim().toLowerCase()
 const matchSearch = (label: string, searchTerm: string): boolean => {
@@ -19,15 +20,16 @@ const toggleTreeOpen = (data: treeItems, itemPath: string) => {
   return data
 }
 
-type treeItem = {
+export type treeItem = {
   path: string
   label: string
   value?: number | string
+  fetchOnly?: boolean
   isOpen: boolean
   items: treeItems
 }
 
-type treeItems = Array<treeItem>
+export type treeItems = Array<treeItem>
 
 interface AddListRowProps {
   data: treeItems
@@ -70,7 +72,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
 
   return (
     <div
-      className={classnames('list-group', {
+      className={classnames('list-group list-group-flush', {
         'pl-4': props.show
       })}
     >
@@ -84,6 +86,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
         const isVisible =
           !props.searchTerm ||
           (isSearch && matchSearch(item.label, props.searchTerm))
+        console.log('add row')
         return (
           <React.Fragment key={path}>
             {isVisible ? (
@@ -114,12 +117,12 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                 </div>
                 <div className="col">
                   <div className="font-weight-bold d-inline">{item.path}</div>
-                  <span
-                    className="text-muted font-monospace font-weight-lighter text-truncate d-inline"
+                  <samp
+                    className="font-monospace font-weight-lighter text-wrap d-inline"
                     style={{ fontSize: '0.8rem' }}
                   >
                     {item.value && adaptValue(item.value)}
-                  </span>
+                  </samp>
                 </div>
                 <div className="col-auto">
                   {hasChild ? (
@@ -165,11 +168,11 @@ const addData = (
   _last: treeItems,
   _parentPath: string,
   _parts: Array<string>,
-  _data: { path: string; value: string | number }
+  _data: JetData
 ): treeItems => {
   let currPath = _parentPath
   const depth = _parts.length
-  const part = _parts.shift()
+  const part = _parts.shift() || ''
   currPath += `${currPath.length > 0 ? '/' : ''}${part}`
   const iFind = _last.findIndex((item) => item.path === currPath)
   if (iFind !== -1) {
@@ -184,6 +187,7 @@ const addData = (
         path: currPath,
         label: part,
         value: _data.value,
+        fetchOnly: _data.fetchOnly,
         isOpen: false,
         items: []
       })
@@ -191,6 +195,7 @@ const addData = (
       _last.push({
         path: currPath,
         label: part,
+        fetchOnly: _data.fetchOnly,
         isOpen: false,
         items: []
       })
@@ -204,30 +209,31 @@ const findPath = (
   path: string,
   index: number,
   treeData: treeItems
-): boolean => {
+): treeItem | null => {
   const parts = path.split('/')
   const it = parts.filter((_, i) => i <= index)
   const findItem = treeData.find((item) => item.path === it.join('/'))
   if (findItem && path === findItem.path && findItem.items.length === 0) {
     console.log(path, findItem.path)
-    return true
+    return findItem
   }
   if (findItem) {
     return findPath(path, index + 1, findItem.items)
   }
-  return false
+  return null
 }
 
 export const FetchBrowser = (): JSX.Element => {
   const [treeData, setTreeData] = useState<treeItems>([])
-  const [searchTerm, setSearchTerm] = useState('')
+  const [filterTerm, setSearchTerm] = useState('')
   const context = useContext(JetContext)
   const fetcher = new jet.Fetcher()
     .path('containsAllOf', [''])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .on('data', (data: { path: string; value: string | number }) => {
+    .on('data', (data: JetData) => {
       setTreeData((items) => {
-        return addData(items, '', data.path.split('/'), data)
+        const updateData = addData(items, '', data.path.split('/'), data)
+        return [...updateData]
       })
     })
 
@@ -244,41 +250,66 @@ export const FetchBrowser = (): JSX.Element => {
     }
   }, [context.peer])
 
-  const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.currentTarget.value)
   }
 
   return (
     <>
       <div className="Split-left">
-        <div className="input-group mb-3">
-          <span className="input-group-text">
-            <Search />
-          </span>
-          <input
-            type="search"
-            className="form-control"
-            aria-label="Type and search"
-            placeholder="Type and search"
-            onChange={onSearch}
-            value={searchTerm}
-          />
-        </div>
-        <AddListRow data={treeData} searchTerm={searchTerm} />
+        {context.peer && context.peer.connected ? (
+          <div className="card">
+            <h5 className="card-header">Filter</h5>
+            <div className="card-body sticky-top bg-white border-bottom">
+              <div className="input-group">
+                <span className="input-group-text">
+                  <Search />
+                </span>
+                <input
+                  type="search"
+                  className="form-control"
+                  aria-label="Type and filter"
+                  placeholder="Type and filter"
+                  onChange={onFilter}
+                  value={filterTerm}
+                />
+              </div>
+            </div>
+            <AddListRow data={treeData} searchTerm={filterTerm} />
+          </div>
+        ) : (
+          <div className="alert alert-info">
+            <h3>Not connected</h3>
+            <span>
+              Please setup a{' '}
+              <Link to="/connections" replace>
+                connection
+              </Link>{' '}
+              first.
+            </span>
+          </div>
+        )}
       </div>
-      {/* <Route
+      <Route
         path="/browser/:path"
         children={({ match }) => {
-          if (
-            match &&
-            match.params.path &&
-            findPath(decodeURIComponent(match.params.path), 0, treeData)
-          ) {
-            return <div className="Split-right">{match.params.path}</div>
+          if (match && match.params.path) {
+            const stateOrMethod = findPath(
+              decodeURIComponent(match.params.path),
+              0,
+              treeData
+            )
+            if (stateOrMethod) {
+              return (
+                <>
+                  <Details stateOrMethod={stateOrMethod} backUrl="/browser" />
+                </>
+              )
+            }
           }
           return <></>
         }}
-      /> */}
+      />
     </>
   )
 }
