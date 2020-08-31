@@ -28,7 +28,7 @@ const TypedInput = (props: TypedInpudProps): JSX.Element => {
     }
   }, [props.value])
 
-  const onChangeNumber = (target) => {
+  const onChangeNumber = (target: EventTarget & HTMLInputElement) => {
     if (target.value.endsWith('.')) {
       setError(false)
       props.onError(props.name, false)
@@ -45,7 +45,8 @@ const TypedInput = (props: TypedInpudProps): JSX.Element => {
     }
   }
 
-  const onChange = ({ target }) => {
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = event
     setValue(target.value)
     switch (type) {
       case 'boolean':

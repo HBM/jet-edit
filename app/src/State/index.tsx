@@ -15,7 +15,8 @@ const createInput = (
   onChange: (name: string, value: TypeInpudValue) => void,
   onError: (name: string, hasError: boolean) => void,
   disabled?: boolean
-) => (nvp) => {
+  // eslint-disable-next-line react/display-name
+) => (nvp: { value: TypeInpudValue; name: string }) => {
   switch (typeof nvp.value) {
     case 'string':
     case 'boolean': {
@@ -70,6 +71,7 @@ const createInput = (
 interface StateProps {
   path: string
   backUrl: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any
   fetchOnly?: boolean
 }
@@ -77,8 +79,9 @@ interface StateProps {
 const State = (props: StateProps): JSX.Element => {
   const [formData, setFormData] = useState(props.value)
   const [formDataBak, setFormDataBak] = useState(props.value)
-  const [error, setError] = useState({})
-  const [connectionFailure, setConnectionFailure] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [error, setError] = useState<{ [key: string]: any }>({})
+  const [, setConnectionFailure] = useState(false)
   const ctx = useContext(JetContext)
 
   useEffect(() => {
@@ -107,6 +110,7 @@ const State = (props: StateProps): JSX.Element => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignToFormData = (name: string, value: any) => {
     setFormData({ ...formData, [name]: value })
   }

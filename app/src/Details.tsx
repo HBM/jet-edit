@@ -13,7 +13,7 @@ export const Details = ({
   stateOrMethod,
   backUrl
 }: DetailsProps): JSX.Element => {
-  const { path } = useParams()
+  const { path } = useParams<{ path: string }>()
 
   if (decodeURIComponent(path) !== stateOrMethod.path) {
     return <></>

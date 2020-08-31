@@ -1,5 +1,5 @@
 import React from 'react'
-import useLocalStorage from '../../app/src/hooks/useLocalStorage'
+import useLocalStorage from './useLocalStorage'
 import { render, fireEvent } from '@testing-library/react'
 
 describe('useLocalStorage hook', (): void => {
