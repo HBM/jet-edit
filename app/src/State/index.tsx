@@ -136,21 +136,21 @@ const State = (props: StateProps): JSX.Element => {
           {nvps.map(createInput(assignToFormData, onError, props.fetchOnly))}
           <hr />
           <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-outline-primary"
-            type="submit"
-            disabled={!(hasChanges() && !hasError())}
-          >
-            Set
-          </button>
-          <button
-            className="btn btn-outline-secondary"
-            type="button"
-            disabled={!hasChanges() && !hasError()}
-            onClick={cancel}
-          >
-            Cancel
-          </button>
+            <button
+              className="btn btn-outline-primary"
+              type="submit"
+              disabled={!(hasChanges() && !hasError())}
+            >
+              Set
+            </button>
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              disabled={!hasChanges() && !hasError()}
+              onClick={cancel}
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>
