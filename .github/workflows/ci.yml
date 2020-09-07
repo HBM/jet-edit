@@ -43,7 +43,7 @@ jobs:
         name: bundle
         path: dist
 
-    - name: delete existing release
+    - name: delete existing release 🔨
       if: github.ref == 'refs/heads/master'
       run: |
         curl \
@@ -55,7 +55,7 @@ jobs:
 
     # https://stackoverflow.com/questions/58257140/unable-to-commit-and-push-back-changes-made-by-github-action-invalid-user
     # https://stackoverflow.com/questions/8044583/how-can-i-move-a-tag-on-a-git-branch-to-a-different-commit
-    - name: move dev tag
+    - name: move dev tag 🐌
       # move tag only on master branch
       if: github.ref == 'refs/heads/master'
       run: |
@@ -68,12 +68,12 @@ jobs:
         # push to github
         git push --tags
 
-    - name: zip bundle
+    - name: zip bundle 🗜️
       if: github.ref == 'refs/heads/master'
       run: |
         zip -r jet-edit-dist.zip dist
 
-    - name: create release for dev tag
+    - name: create release for dev tag 🔖
       id: create_release
       uses: actions/create-release@v1
       if: github.ref == 'refs/heads/master'
@@ -112,15 +112,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Checkout code
+    - name: Checkout code 🛎️
       uses: actions/checkout@master
 
-    - name: setup node
+    - name: Setup node 📦
       uses: actions/setup-node@v1
       with:
         node-version: '14.x'
 
-    - name: build bundle
+    - name: build bundle 🔗 + 🗜️
       run: |
         npm run bundle
         zip -r jet-edit-dist.zip dist
@@ -135,7 +135,7 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: upload assets
+    - name: upload assets 📁
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
