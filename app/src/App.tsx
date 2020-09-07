@@ -24,7 +24,7 @@ const Index = (): JSX.Element => {
 const App = (): JSX.Element => (
   <ToastProvider timeout={8000}>
     <JetProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={window.location.pathname}>
         <Index />
       </BrowserRouter>
     </JetProvider>
