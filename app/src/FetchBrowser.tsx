@@ -4,8 +4,15 @@ import flatten from 'flat'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavLink, Route, Link } from 'react-router-dom'
 import { JetContext, JetData } from './contexts/Jet'
-import { Search, AddCircle, RemoveCircle } from './SVG-Icons'
+import {
+  Search,
+  AddCircle,
+  RemoveCircle,
+  Favorite,
+  FavoriteBorder
+} from './SVG-Icons'
 import { Details } from './Details'
+import useLocalStorage from './hooks/useLocalStorage'
 
 const processString = (text: string): string => text.trim().toLowerCase()
 const matchSearch = (label: string, searchTerm: string): boolean => {
@@ -33,6 +40,7 @@ export type treeItems = Array<treeItem>
 
 interface AddListRowProps {
   data: treeItems
+  showFavorites: boolean
   show?: boolean
   searchTerm?: string
 }
@@ -63,12 +71,25 @@ const adaptValue = (
   return <div>{contentEmpty ? 'No matching fields' : content}</div>
 }
 
+const storeFavorites = 'favorites'
 const AddListRow = (props: AddListRowProps): JSX.Element => {
   const [treeData, setTreeData] = useState<treeItems>([])
+  const [favorites, setFavorites] = useLocalStorage<string[]>(
+    storeFavorites,
+    []
+  )
 
   useEffect(() => {
     setTreeData(props.data)
   }, [props.data])
+
+  const toggleFavorite = (path: string) => {
+    if (favorites.indexOf(path) === -1) {
+      setFavorites([...favorites, path].sort())
+    } else {
+      setFavorites(favorites.filter((item) => item !== path))
+    }
+  }
 
   return (
     <div
@@ -80,13 +101,18 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
         const count = item.items.length
         const hasChild = count > 0
         const path = item.path
+        const isFavorite = favorites.indexOf(item.path) !== -1
         const isSearch = !!props.searchTerm
-        const isOpen = item.isOpen || isSearch
+        const isOpen = item.isOpen || isSearch || props.showFavorites
         const isMethod = !hasChild && typeof item.value === 'undefined'
-        const isVisible =
+        let isVisible =
           !props.searchTerm ||
           (isSearch && matchSearch(item.label, props.searchTerm))
-        console.log('add row')
+
+        if (props.showFavorites) {
+          isVisible = isFavorite && isVisible
+        }
+
         return (
           <React.Fragment key={path}>
             {isVisible ? (
@@ -146,6 +172,14 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                       S
                     </span>
                   )}
+                  {hasChild ? null : (
+                    <a
+                      className="ml-1"
+                      onClick={() => toggleFavorite(item.path)}
+                    >
+                      {isFavorite ? <Favorite /> : <FavoriteBorder />}
+                    </a>
+                  )}
                 </div>
               </NavLink>
             ) : null}
@@ -153,6 +187,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
               <AddListRow
                 key={`${path}-${count}`}
                 data={item.items}
+                showFavorites={props.showFavorites}
                 show={item.isOpen}
                 searchTerm={props.searchTerm}
               />
@@ -214,7 +249,6 @@ const findPath = (
   const it = parts.filter((_, i) => i <= index)
   const findItem = treeData.find((item) => item.path === it.join('/'))
   if (findItem && path === findItem.path && findItem.items.length === 0) {
-    console.log(path, findItem.path)
     return findItem
   }
   if (findItem) {
@@ -226,6 +260,10 @@ const findPath = (
 export const FetchBrowser = (): JSX.Element => {
   const [treeData, setTreeData] = useState<treeItems>([])
   const [filterTerm, setSearchTerm] = useState('')
+  const [showFavorites, setShowFavorites] = useLocalStorage<boolean>(
+    'showFavorites',
+    false
+  )
   const context = useContext(JetContext)
   const fetcher = new jet.Fetcher()
     .path('containsAllOf', [''])
@@ -254,13 +292,17 @@ export const FetchBrowser = (): JSX.Element => {
     setSearchTerm(event.currentTarget.value)
   }
 
+  const toggleShowFavorites = () => {
+    setShowFavorites(!showFavorites)
+  }
+
   return (
     <>
       <div className="Split-left">
         {context.peer && context.peer.connected ? (
           <div className="card">
             <h5 className="card-header">Filter</h5>
-            <div className="card-body sticky-top bg-white border-bottom">
+            <div className="card-body sticky-top bg-white border-bottom d-flex">
               <div className="input-group">
                 <span className="input-group-text">
                   <Search />
@@ -274,8 +316,20 @@ export const FetchBrowser = (): JSX.Element => {
                   value={filterTerm}
                 />
               </div>
+              <button
+                className="btn btn-outline-secondary text-nowrap ml-2"
+                type="button"
+                onClick={toggleShowFavorites}
+                title={showFavorites ? 'Hide Favorites' : 'Show Favorites'}
+              >
+                {showFavorites ? <Favorite /> : <FavoriteBorder />}
+              </button>
             </div>
-            <AddListRow data={treeData} searchTerm={filterTerm} />
+            <AddListRow
+              data={treeData}
+              searchTerm={filterTerm}
+              showFavorites={showFavorites}
+            />
           </div>
         ) : (
           <div className="alert alert-info">
