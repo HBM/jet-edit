@@ -85,7 +85,7 @@ jobs:
         draft: false
         prerelease: true
 
-    - name: build assets and upload to dev tag
+    - name: build assets and upload to dev tag 🏗️
       if: github.ref == 'refs/heads/master'
       uses: actions/upload-release-asset@v1
       env:
