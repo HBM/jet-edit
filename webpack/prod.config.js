@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CompressionPlugin = require('compression-webpack-plugin')
+// const CompressionPlugin = require('compression-webpack-plugin')
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -70,10 +70,10 @@ module.exports = {
         minifyURLs: true
       }
     }),
-    new CompressionPlugin({
-      deleteOriginalAssets: true,
-      test: /\.js$|\.css$|\.html$/
-    }),
+    // new CompressionPlugin({
+    //   deleteOriginalAssets: true,
+    //   test: /\.js$|\.css$|\.html$/
+    // }),
     new DuplicatePackageCheckerPlugin()
   ]
 }
