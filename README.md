@@ -6,6 +6,9 @@
 
 This is the source code repository of the Webinterface for Jet Single Page web Application (SPA).
 
+* [WebSockets](http://hbm.github.io/jet-edit).
+* [Secure WebSockets](https://hbm.github.io/jet-edit).
+
 ## Software Tools
 
 - [Webpack](https://webpack.js.org/): A module bundler to easily combine and integrate any used JS module in a single JS-Bundle.
