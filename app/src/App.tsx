@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect, HashRouter } from 'react-router-dom'
 import { Header } from './Header'
 import { JetProvider } from './contexts/Jet'
 import { ToastProvider } from './contexts/Toast'
@@ -27,9 +27,9 @@ const Index = (): JSX.Element => {
 const App = (): JSX.Element => (
   <ToastProvider timeout={8000}>
     <JetProvider>
-      <BrowserRouter basename={window.location.pathname}>
+      <HashRouter>
         <Index />
-      </BrowserRouter>
+      </HashRouter>
     </JetProvider>
   </ToastProvider>
 )
