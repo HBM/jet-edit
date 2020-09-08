@@ -278,7 +278,7 @@ export const FetchBrowser = (): JSX.Element => {
   useEffect(() => {
     if (context.peer) {
       context.peer
-        .fetch(fetcher)
+        .fetch(fetcher, true)
         .catch(() => context.connectionFailure(context.conID))
     }
     return () => {
