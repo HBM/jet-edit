@@ -1,12 +1,12 @@
 
 .Split-left {
   grid-area: split-left;
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
 }
 
 .Split-right {
   grid-area: split-left;
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
 }
 
 .Split-right::before {
@@ -25,9 +25,14 @@
   z-index: 1040;
 }
 
-@include media-breakpoint-up(lg) {
+@include media-breakpoint-up(xl) {
+  .Split-left {
+    padding-right: 0;
+  }
+
   .Split-right {
     grid-area: split-right;
+    padding-left: 0;
   }
 
   .Split-right::before {

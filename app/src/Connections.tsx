@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Connection } from './Connection'
-import { useRouteMatch, useHistory } from 'react-router-dom'
+import { useRouteMatch, useHistory, Route, Switch } from 'react-router-dom'
 import { JetContext } from './contexts/Jet'
 import { AddCircle, RemoveCircle } from './SVG-Icons'
 
@@ -18,7 +18,7 @@ const TableRow = (): JSX.Element => {
   const history = useHistory()
 
   const match = useRouteMatch<{ id: string }>({
-    path: '/connections/:id',
+    path: '/connections/:id(\\d+)',
     exact: true
   })
 
@@ -30,14 +30,14 @@ const TableRow = (): JSX.Element => {
   return (
     <tbody>
       {ctx.connections.map((item, index) => {
-        const newID = index + 1
+        const displayIndex = index + 1
         const url = `${item.ws.scheme}://${item.ws.url}`
         let status = 'Not configured'
         let isConnected = false
         let connectClassname = 'text-secondary'
         if (isValidWebSocketUrl(url)) {
           connectClassname = 'alert-warning'
-          if (ctx.peer && ctx.peer.connected) {
+          if (ctx.peer && ctx.peer.connected && index === ctx.conID) {
             isConnected = true
             connectClassname = 'alert-success'
           }
@@ -45,18 +45,18 @@ const TableRow = (): JSX.Element => {
         }
         return (
           <tr
-            key={newID}
+            key={displayIndex}
             className={
               index === selectedIndex
                 ? `${connectClassname} table-active`
                 : `${connectClassname}`
             }
             onClick={() => {
-              history.push(`/connections/${newID}`)
+              history.push(`/connections/${displayIndex}`)
             }}
             style={{ cursor: 'pointer' }}
           >
-            <th scope="row">{newID}</th>
+            <th scope="row">{displayIndex}</th>
             <td>{url}</td>
             <td>{item.name}</td>
             <td>{status}</td>
@@ -65,8 +65,11 @@ const TableRow = (): JSX.Element => {
                 type="button"
                 className="btn btn-sm float-right"
                 title="remove connection"
-                onClick={() => {
-                  ctx.connectionRemove(newID - 1)
+                onClick={(
+                  event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                ) => {
+                  event.stopPropagation()
+                  ctx.connectionRemove(index)
                 }}
               >
                 <RemoveCircle style={{ fill: 'var(--bs-red)' }} />
@@ -131,7 +134,21 @@ export const Connections = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <Connection />
+      <Switch>
+        <Route
+          path="/connections/:id"
+          exact
+          render={({ match }) => {
+            if (match) {
+              const currentID = parseInt(match.params.id) - 1
+              if (ctx.connections[currentID]) {
+                return <Connection index={currentID} />
+              }
+            }
+            return null
+          }}
+        />
+      </Switch>
     </>
   )
 }
