@@ -2,7 +2,7 @@ import jet from 'node-jet'
 import classnames from 'classnames'
 import flatten from 'flat'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavLink, Route, Link } from 'react-router-dom'
+import { NavLink, Route, Link, useHistory, useLocation } from 'react-router-dom'
 import { JetContext, JetData } from './contexts/Jet'
 import {
   Search,
@@ -78,6 +78,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
     storeFavorites,
     []
   )
+  const location = useLocation()
 
   useEffect(() => {
     setTreeData(props.data)
@@ -105,6 +106,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
         const isSearch = !!props.searchTerm
         const isOpen = item.isOpen || isSearch || props.showFavorites
         const isMethod = !hasChild && typeof item.value === 'undefined'
+
         let isVisible =
           !props.searchTerm ||
           (isSearch && matchSearch(item.label, props.searchTerm))
@@ -118,6 +120,9 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
             {isVisible ? (
               <NavLink
                 to={{ pathname: `/browser/${encodeURIComponent(path)}` }}
+                replace={
+                  `/browser/${encodeURIComponent(path)}` === location.pathname
+                }
                 role="button"
                 className={classnames(
                   'list-group-item d-flex justify-content-between align-items-center',
@@ -125,7 +130,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                     'list-group-item-action': hasChild
                   }
                 )}
-                onClick={() => {
+                onClick={(): void => {
                   if (hasChild && !isSearch) {
                     setTreeData((items) => toggleTreeOpen(items, path))
                   }
@@ -173,12 +178,21 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                     </span>
                   )}
                   {hasChild ? null : (
-                    <a
+                    <span
                       className="ml-1"
-                      onClick={() => toggleFavorite(item.path)}
+                      onClick={(
+                        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                      ): void => {
+                        event.preventDefault()
+                        toggleFavorite(item.path)
+                      }}
                     >
-                      {isFavorite ? <Favorite /> : <FavoriteBorder />}
-                    </a>
+                      {isFavorite ? (
+                        <Favorite style={{ fill: 'var(--bs-red)' }} />
+                      ) : (
+                        <FavoriteBorder />
+                      )}
+                    </span>
                   )}
                 </div>
               </NavLink>
@@ -208,7 +222,9 @@ const addData = (
   let currPath = _parentPath
   const depth = _parts.length
   const part = _parts.shift() || ''
-  currPath += `${currPath.length > 0 ? '/' : ''}${part}`
+  console.log(currPath)
+  currPath += `_data.path[0] === '/' ? '/' : ''}`
+  currPath += `${currPath.length > 1 ? '/' : ''}${part}`
   const iFind = _last.findIndex((item) => item.path === currPath)
   if (iFind !== -1) {
     if (depth === 1) {
@@ -270,7 +286,14 @@ export const FetchBrowser = (): JSX.Element => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on('data', (data: JetData) => {
       setTreeData((items) => {
-        const updateData = addData(items, '', data.path.split('/'), data)
+        const splitPath = data.path.split('/')
+        const startPath = splitPath[0] === '' ? '/' : ''
+        const updateData = addData(
+          items,
+          startPath,
+          splitPath.filter((item) => item),
+          data
+        )
         return [...updateData]
       })
     })
@@ -322,7 +345,11 @@ export const FetchBrowser = (): JSX.Element => {
                 onClick={toggleShowFavorites}
                 title={showFavorites ? 'Hide Favorites' : 'Show Favorites'}
               >
-                {showFavorites ? <Favorite /> : <FavoriteBorder />}
+                {showFavorites ? (
+                  <Favorite style={{ fill: 'var(--bs-red)' }} />
+                ) : (
+                  <FavoriteBorder />
+                )}
               </button>
             </div>
             <AddListRow
@@ -346,7 +373,7 @@ export const FetchBrowser = (): JSX.Element => {
       </div>
       <Route
         path="/browser/:path"
-        children={({ match }) => {
+        render={({ match }) => {
           if (match && match.params.path) {
             const stateOrMethod = findPath(
               decodeURIComponent(match.params.path),
@@ -361,7 +388,7 @@ export const FetchBrowser = (): JSX.Element => {
               )
             }
           }
-          return <></>
+          return null
         }}
       />
     </>

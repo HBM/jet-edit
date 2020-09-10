@@ -16,7 +16,6 @@ export const isValidWebSocketUrl = (urlString: string): boolean => {
 const TableRow = (): JSX.Element => {
   const ctx = useContext(JetContext)
   const history = useHistory()
-
   const match = useRouteMatch<{ id: string }>({
     path: '/connections/:id(\\d+)',
     exact: true
@@ -68,7 +67,7 @@ const TableRow = (): JSX.Element => {
                 onClick={(
                   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
                 ) => {
-                  event.stopPropagation()
+                  event.preventDefault()
                   ctx.connectionRemove(index)
                 }}
               >
@@ -139,7 +138,7 @@ export const Connections = (): JSX.Element => {
           path="/connections/:id"
           exact
           render={({ match }) => {
-            if (match) {
+            if (match && match.params.id) {
               const currentID = parseInt(match.params.id) - 1
               if (ctx.connections[currentID]) {
                 return <Connection index={currentID} />
