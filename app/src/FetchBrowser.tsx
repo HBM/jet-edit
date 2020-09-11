@@ -221,36 +221,40 @@ const addData = (
 ): treeItems => {
   let currPath = _parentPath
   const depth = _parts.length
-  const part = _parts.shift() || ''
-  console.log(currPath)
-  currPath += `_data.path[0] === '/' ? '/' : ''}`
-  currPath += `${currPath.length > 1 ? '/' : ''}${part}`
-  const iFind = _last.findIndex((item) => item.path === currPath)
-  if (iFind !== -1) {
-    if (depth === 1) {
-      _last[iFind].value = _data.value
+  let part = _parts.shift()
+  if (part === '') {
+    const nextPart = _parts.shift() || ''
+    part = `/${nextPart}`
+  }
+  if (part !== undefined) {
+    currPath += `${currPath.length > 0 ? '/' : ''}${part}`
+    const iFind = _last.findIndex((item) => item.path === currPath)
+    if (iFind !== -1) {
+      if (depth === 1) {
+        _last[iFind].value = _data.value
+      } else {
+        addData(_last[iFind].items, currPath, _parts, _data)
+      }
     } else {
-      addData(_last[iFind].items, currPath, _parts, _data)
-    }
-  } else {
-    if (depth === 1) {
-      _last.push({
-        path: currPath,
-        label: part,
-        value: _data.value,
-        fetchOnly: _data.fetchOnly,
-        isOpen: false,
-        items: []
-      })
-    } else {
-      _last.push({
-        path: currPath,
-        label: part,
-        fetchOnly: _data.fetchOnly,
-        isOpen: false,
-        items: []
-      })
-      addData(_last[_last.length - 1].items, currPath, _parts, _data)
+      if (depth === 1) {
+        _last.push({
+          path: currPath,
+          label: part,
+          value: _data.value,
+          fetchOnly: _data.fetchOnly,
+          isOpen: false,
+          items: []
+        })
+      } else {
+        _last.push({
+          path: currPath,
+          label: part,
+          fetchOnly: _data.fetchOnly,
+          isOpen: false,
+          items: []
+        })
+        addData(_last[_last.length - 1].items, currPath, _parts, _data)
+      }
     }
   }
   return _last
@@ -262,6 +266,10 @@ const findPath = (
   treeData: treeItems
 ): treeItem | null => {
   const parts = path.split('/')
+  if (parts[0] === '') {
+    parts.shift()
+    parts[0] = `/${parts[0]}`
+  }
   const it = parts.filter((_, i) => i <= index)
   const findItem = treeData.find((item) => item.path === it.join('/'))
   if (findItem && path === findItem.path && findItem.items.length === 0) {
@@ -286,14 +294,7 @@ export const FetchBrowser = (): JSX.Element => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on('data', (data: JetData) => {
       setTreeData((items) => {
-        const splitPath = data.path.split('/')
-        const startPath = splitPath[0] === '' ? '/' : ''
-        const updateData = addData(
-          items,
-          startPath,
-          splitPath.filter((item) => item),
-          data
-        )
+        const updateData = addData(items, '', data.path.split('/'), data)
         return [...updateData]
       })
     })
