@@ -2,7 +2,7 @@ import jet from 'node-jet'
 import classnames from 'classnames'
 import flatten from 'flat'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavLink, Route, Link } from 'react-router-dom'
+import { NavLink, Route, Link, useHistory, useLocation } from 'react-router-dom'
 import { JetContext, JetData } from './contexts/Jet'
 import {
   Search,
@@ -78,6 +78,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
     storeFavorites,
     []
   )
+  const location = useLocation()
 
   useEffect(() => {
     setTreeData(props.data)
@@ -105,6 +106,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
         const isSearch = !!props.searchTerm
         const isOpen = item.isOpen || isSearch || props.showFavorites
         const isMethod = !hasChild && typeof item.value === 'undefined'
+
         let isVisible =
           !props.searchTerm ||
           (isSearch && matchSearch(item.label, props.searchTerm))
@@ -118,6 +120,9 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
             {isVisible ? (
               <NavLink
                 to={{ pathname: `/browser/${encodeURIComponent(path)}` }}
+                replace={
+                  `/browser/${encodeURIComponent(path)}` === location.pathname
+                }
                 role="button"
                 className={classnames(
                   'list-group-item d-flex justify-content-between align-items-center',
@@ -125,7 +130,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                     'list-group-item-action': hasChild
                   }
                 )}
-                onClick={() => {
+                onClick={(): void => {
                   if (hasChild && !isSearch) {
                     setTreeData((items) => toggleTreeOpen(items, path))
                   }
@@ -173,12 +178,21 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                     </span>
                   )}
                   {hasChild ? null : (
-                    <a
+                    <span
                       className="ml-1"
-                      onClick={() => toggleFavorite(item.path)}
+                      onClick={(
+                        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                      ): void => {
+                        event.preventDefault()
+                        toggleFavorite(item.path)
+                      }}
                     >
-                      {isFavorite ? <Favorite /> : <FavoriteBorder />}
-                    </a>
+                      {isFavorite ? (
+                        <Favorite style={{ fill: 'var(--bs-red)' }} />
+                      ) : (
+                        <FavoriteBorder />
+                      )}
+                    </span>
                   )}
                 </div>
               </NavLink>
@@ -207,34 +221,40 @@ const addData = (
 ): treeItems => {
   let currPath = _parentPath
   const depth = _parts.length
-  const part = _parts.shift() || ''
-  currPath += `${currPath.length > 0 ? '/' : ''}${part}`
-  const iFind = _last.findIndex((item) => item.path === currPath)
-  if (iFind !== -1) {
-    if (depth === 1) {
-      _last[iFind].value = _data.value
+  let part = _parts.shift()
+  if (part === '') {
+    const nextPart = _parts.shift() || ''
+    part = `/${nextPart}`
+  }
+  if (part !== undefined) {
+    currPath += `${currPath.length > 0 ? '/' : ''}${part}`
+    const iFind = _last.findIndex((item) => item.path === currPath)
+    if (iFind !== -1) {
+      if (depth === 1) {
+        _last[iFind].value = _data.value
+      } else {
+        addData(_last[iFind].items, currPath, _parts, _data)
+      }
     } else {
-      addData(_last[iFind].items, currPath, _parts, _data)
-    }
-  } else {
-    if (depth === 1) {
-      _last.push({
-        path: currPath,
-        label: part,
-        value: _data.value,
-        fetchOnly: _data.fetchOnly,
-        isOpen: false,
-        items: []
-      })
-    } else {
-      _last.push({
-        path: currPath,
-        label: part,
-        fetchOnly: _data.fetchOnly,
-        isOpen: false,
-        items: []
-      })
-      addData(_last[_last.length - 1].items, currPath, _parts, _data)
+      if (depth === 1) {
+        _last.push({
+          path: currPath,
+          label: part,
+          value: _data.value,
+          fetchOnly: _data.fetchOnly,
+          isOpen: false,
+          items: []
+        })
+      } else {
+        _last.push({
+          path: currPath,
+          label: part,
+          fetchOnly: _data.fetchOnly,
+          isOpen: false,
+          items: []
+        })
+        addData(_last[_last.length - 1].items, currPath, _parts, _data)
+      }
     }
   }
   return _last
@@ -246,6 +266,10 @@ const findPath = (
   treeData: treeItems
 ): treeItem | null => {
   const parts = path.split('/')
+  if (parts[0] === '') {
+    parts.shift()
+    parts[0] = `/${parts[0]}`
+  }
   const it = parts.filter((_, i) => i <= index)
   const findItem = treeData.find((item) => item.path === it.join('/'))
   if (findItem && path === findItem.path && findItem.items.length === 0) {
@@ -322,7 +346,11 @@ export const FetchBrowser = (): JSX.Element => {
                 onClick={toggleShowFavorites}
                 title={showFavorites ? 'Hide Favorites' : 'Show Favorites'}
               >
-                {showFavorites ? <Favorite /> : <FavoriteBorder />}
+                {showFavorites ? (
+                  <Favorite style={{ fill: 'var(--bs-red)' }} />
+                ) : (
+                  <FavoriteBorder />
+                )}
               </button>
             </div>
             <AddListRow
@@ -346,7 +374,7 @@ export const FetchBrowser = (): JSX.Element => {
       </div>
       <Route
         path="/browser/:path"
-        children={({ match }) => {
+        render={({ match }) => {
           if (match && match.params.path) {
             const stateOrMethod = findPath(
               decodeURIComponent(match.params.path),
@@ -361,7 +389,7 @@ export const FetchBrowser = (): JSX.Element => {
               )
             }
           }
-          return <></>
+          return null
         }}
       />
     </>
