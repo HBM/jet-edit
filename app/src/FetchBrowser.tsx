@@ -2,7 +2,7 @@ import jet from 'node-jet'
 import classnames from 'classnames'
 import flatten from 'flat'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavLink, Route, Link, useHistory, useLocation } from 'react-router-dom'
+import { NavLink, Route, Link, useLocation } from 'react-router-dom'
 import { JetContext, JetData } from './contexts/Jet'
 import {
   Search,
