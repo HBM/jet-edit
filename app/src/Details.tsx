@@ -5,7 +5,7 @@ import Method from './Method'
 import State from './State'
 
 interface DetailsProps {
-  stateOrMethod: treeItem
+  stateOrMethod: Pick<treeItem, 'path' | 'value' | 'fetchOnly'>
   backUrl: string
 }
 
@@ -26,6 +26,7 @@ export const Details = ({
         <State
           path={stateOrMethod.path}
           value={stateOrMethod.value}
+          fetchOnly={stateOrMethod.fetchOnly}
           backUrl={backUrl}
         />
       )}

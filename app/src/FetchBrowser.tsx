@@ -15,7 +15,7 @@ import { Details } from './Details'
 import useLocalStorage from './hooks/useLocalStorage'
 
 const processString = (text: string): string => text.trim().toLowerCase()
-const matchSearch = (label: string, searchTerm: string): boolean => {
+export const matchSearch = (label: string, searchTerm: string): boolean => {
   return processString(label).includes(processString(searchTerm))
 }
 
@@ -38,14 +38,14 @@ export type treeItem = {
 
 export type treeItems = Array<treeItem>
 
-interface AddListRowProps {
+interface AddFetchRowProps {
   data: treeItems
   showFavorites: boolean
   show?: boolean
   searchTerm?: string
 }
 
-const adaptValue = (
+export const adaptValue = (
   value: string | number | Record<string, unknown>
 ): JSX.Element => {
   let content
@@ -71,8 +71,8 @@ const adaptValue = (
   return <div>{contentEmpty ? 'No matching fields' : content}</div>
 }
 
-const storeFavorites = 'favorites'
-const AddListRow = (props: AddListRowProps): JSX.Element => {
+export const storeFavorites = 'favorites'
+const FetchRows = (props: AddFetchRowProps): JSX.Element => {
   const [treeData, setTreeData] = useState<treeItems>([])
   const [favorites, setFavorites] = useLocalStorage<string[]>(
     storeFavorites,
@@ -99,7 +99,7 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
       })}
     >
       {treeData.map((item) => {
-        const count = item.items.length
+        const count = item.items ? item.items.length : 0
         const hasChild = count > 0
         const path = item.path
         const isFavorite = favorites.indexOf(item.path) !== -1
@@ -109,7 +109,10 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
 
         let isVisible =
           !props.searchTerm ||
-          (isSearch && matchSearch(item.label, props.searchTerm))
+          (isSearch &&
+            (matchSearch(item.label, props.searchTerm) ||
+              matchSearch(item.path, props.searchTerm) ||
+              matchSearch(`${item.value}`, props.searchTerm)))
 
         if (props.showFavorites) {
           isVisible = isFavorite && isVisible
@@ -197,8 +200,8 @@ const AddListRow = (props: AddListRowProps): JSX.Element => {
                 </div>
               </NavLink>
             ) : null}
-            {isOpen ? (
-              <AddListRow
+            {isOpen && item.items ? (
+              <FetchRows
                 key={`${path}-${count}`}
                 data={item.items}
                 showFavorites={props.showFavorites}
@@ -320,6 +323,24 @@ export const FetchBrowser = (): JSX.Element => {
     setShowFavorites(!showFavorites)
   }
 
+  const renderContent = () => {
+    if (treeData.length > 0) {
+      return (
+        <FetchRows
+          data={treeData}
+          searchTerm={filterTerm}
+          showFavorites={showFavorites}
+        />
+      )
+    } else {
+      return (
+        <div className="Info">
+          <h3>No data available</h3>
+        </div>
+      )
+    }
+  }
+
   return (
     <>
       <div className="Split-left">
@@ -338,12 +359,14 @@ export const FetchBrowser = (): JSX.Element => {
                   placeholder="Type and filter"
                   onChange={onFilter}
                   value={filterTerm}
+                  disabled={treeData.length === 0}
                 />
               </div>
               <button
                 className="btn btn-outline-secondary text-nowrap ml-2"
                 type="button"
                 onClick={toggleShowFavorites}
+                disabled={treeData.length === 0}
                 title={showFavorites ? 'Hide Favorites' : 'Show Favorites'}
               >
                 {showFavorites ? (
@@ -353,11 +376,7 @@ export const FetchBrowser = (): JSX.Element => {
                 )}
               </button>
             </div>
-            <AddListRow
-              data={treeData}
-              searchTerm={filterTerm}
-              showFavorites={showFavorites}
-            />
+            {renderContent()}
           </div>
         ) : (
           <div className="alert alert-info">
