@@ -95,7 +95,7 @@ const FavoritesRows = (props: FaviretesRowsProps): JSX.Element => {
 }
 
 export const Favorites = (): JSX.Element => {
-  const [treeData, setTreeData] = useState<treeFetchItems | never[]>([])
+  const [treeData, setTreeData] = useState<treeFetchItems>(Object)
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const fetcher = useRef<jet.Fetcher>(null)
@@ -108,7 +108,7 @@ export const Favorites = (): JSX.Element => {
   const fetch = async () => {
     if (context.peer) {
       const peer = context.peer
-      setTreeData(() => [])
+      setTreeData({})
       if (fetcher.current) {
         peer
           .unfetch(fetcher.current)
@@ -232,7 +232,8 @@ export const Favorites = (): JSX.Element => {
         path="/favorites/:path"
         render={({ match }) => {
           if (match && match.params.path) {
-            const pathFound = treeData[decodeURIComponent(match.params.path)]
+            const decodePath = decodeURIComponent(match.params.path)
+            const pathFound = treeData[decodePath]
             if (pathFound) {
               return (
                 <>

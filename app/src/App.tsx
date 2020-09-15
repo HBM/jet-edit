@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  Switch,
-  Route,
-  Redirect,
-  HashRouter,
-  useLocation
-} from 'react-router-dom'
+import { Switch, Route, Redirect, HashRouter } from 'react-router-dom'
 import { Header } from './Header'
 import { JetProvider } from './contexts/Jet'
 import { ToastProvider } from './contexts/Toast'
@@ -14,7 +8,6 @@ import { FetchBrowser } from './FetchBrowser'
 import { Favorites } from './Favorites'
 
 const Index = (): JSX.Element => {
-  const location = useLocation()
   return (
     <>
       <Header />

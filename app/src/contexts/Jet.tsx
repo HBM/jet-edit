@@ -12,9 +12,12 @@ export interface JetData {
 export interface JetPeerInterface {
   close: () => Promise<void>
   call: <T>(path: string, value: T) => Promise<void>
-  fetch: (fetcher: object, asNotification?: boolean) => Promise<void>
+  fetch: (
+    fetcher: Record<string, unknown>,
+    asNotification?: boolean
+  ) => Promise<void>
   set: <T>(path: string, value: T) => Promise<void>
-  unfetch: (fetcher: object) => Promise<void>
+  unfetch: (fetcher: Record<string, unknown>) => Promise<void>
   connected: boolean
 }
 
