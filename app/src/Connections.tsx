@@ -1,6 +1,12 @@
 import React, { useContext } from 'react'
 import { Connection } from './Connection'
-import { useRouteMatch, useHistory, Route, Switch } from 'react-router-dom'
+import {
+  useRouteMatch,
+  useHistory,
+  Route,
+  Switch,
+  Redirect
+} from 'react-router-dom'
 import { JetContext } from './contexts/Jet'
 import { AddCircle, RemoveCircle } from './SVG-Icons'
 
@@ -143,6 +149,17 @@ export const Connections = (): JSX.Element => {
               if (ctx.connections[currentID]) {
                 return <Connection index={currentID} />
               }
+            }
+            return null
+          }}
+        />
+        <Route
+          path="/connections"
+          exact
+          render={({ match }) => {
+            if (match) {
+              const lastConId = ctx.conID > -1 ? ctx.conID : 0
+              return <Redirect to={`/connections/${lastConId}`} />
             }
             return null
           }}
