@@ -35,6 +35,14 @@ export const NavbarPanel = (props: NavbarPanelProps): JSX.Element => {
         >
           Browser
         </NavLink>
+        {/* <NavLink
+          to={{ pathname: '/search' }}
+          className="nav-link"
+          activeClassName="active"
+          aria-current="page"
+        >
+          Search
+        </NavLink> */}
         <NavLink
           to={{ pathname: '/favorites' }}
           className="nav-link"

@@ -6,6 +6,7 @@ import { ToastProvider } from './contexts/Toast'
 import { Connections } from './Connections'
 import { FetchBrowser } from './FetchBrowser'
 import { Favorites } from './Favorites'
+// import { JetSearch } from './JetSearch'
 
 const Index = (): JSX.Element => {
   return (
@@ -16,6 +17,7 @@ const Index = (): JSX.Element => {
           <Route exact path="/" component={Connections} />
           <Route path="/connections" component={Connections} />
           <Route path="/browser" component={FetchBrowser} />
+          {/* <Route path="/search" component={JetSearch} /> */}
           <Route path="/favorites" component={Favorites} />
           <Route path="*">
             <Redirect to="/" />

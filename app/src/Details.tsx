@@ -1,35 +1,30 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import { treeItem } from './FetchBrowser'
 import Method from './Method'
 import State from './State'
 
 interface DetailsProps {
-  stateOrMethod: Pick<treeItem, 'path' | 'value' | 'fetchOnly'>
+  jetPath: string
+  value?: string | number
+  fetchOnly?: boolean
   backUrl: string
 }
 
 export const Details = ({
-  stateOrMethod,
+  jetPath,
+  value,
+  fetchOnly,
   backUrl
-}: DetailsProps): JSX.Element => {
-  const { path } = useParams<{ path: string }>()
-
-  if (decodeURIComponent(path) !== stateOrMethod.path) {
-    return <></>
-  }
-  return (
-    <div className="Split-right">
-      {typeof stateOrMethod.value === 'undefined' ? (
-        <Method path={stateOrMethod.path} backUrl={backUrl} />
-      ) : (
-        <State
-          path={stateOrMethod.path}
-          value={stateOrMethod.value}
-          fetchOnly={stateOrMethod.fetchOnly}
-          backUrl={backUrl}
-        />
-      )}
-    </div>
-  )
-}
+}: DetailsProps): JSX.Element => (
+  <div className="Split-right">
+    {typeof value === 'undefined' ? (
+      <Method path={jetPath} backUrl={backUrl} />
+    ) : (
+      <State
+        path={jetPath}
+        value={value}
+        fetchOnly={fetchOnly}
+        backUrl={backUrl}
+      />
+    )}
+  </div>
+)

@@ -16,22 +16,22 @@ interface FaviretesRowsProps {
   toggleFavorite: (path: string) => void
   favorites: string[]
   data: treeFetchItems
-  searchTerm?: string
+  filterTerm?: string
 }
 
 const FavoritesRows = (props: FaviretesRowsProps): JSX.Element => {
   const location = useLocation()
-  const isSearch = !!props.searchTerm
+  const isSearch = !!props.filterTerm
 
   return (
     <>
       {Object.values(props.data).map((item) => {
         const isMethod = typeof item.value === 'undefined'
         const isVisible =
-          !props.searchTerm ||
+          !props.filterTerm ||
           (isSearch &&
-            (matchSearch(item.path, props.searchTerm) ||
-              matchSearch(`${item.value}`, props.searchTerm)))
+            (matchSearch(item.path, props.filterTerm) ||
+              matchSearch(`${item.value}`, props.filterTerm)))
         return (
           <React.Fragment key={item.path}>
             {isVisible ? (
@@ -161,7 +161,7 @@ export const Favorites = (): JSX.Element => {
       return (
         <FavoritesRows
           data={treeData}
-          searchTerm={filterTerm}
+          filterTerm={filterTerm}
           favorites={favorites}
           toggleFavorite={toggleFavorite}
         />
@@ -236,16 +236,12 @@ export const Favorites = (): JSX.Element => {
             const pathFound = treeData[decodePath]
             if (pathFound) {
               return (
-                <>
-                  <Details
-                    stateOrMethod={{
-                      path: pathFound.path,
-                      value: pathFound.value,
-                      fetchOnly: pathFound.fetchOnly
-                    }}
-                    backUrl="/favorites"
-                  />
-                </>
+                <Details
+                  jetPath={pathFound.path}
+                  value={pathFound.value}
+                  fetchOnly={pathFound.fetchOnly}
+                  backUrl="/favorites"
+                />
               )
             }
           }

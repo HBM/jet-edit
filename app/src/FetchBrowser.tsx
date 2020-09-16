@@ -27,7 +27,7 @@ const toggleTreeOpen = (data: treeItems, itemPath: string) => {
   return data
 }
 
-export type treeItem = {
+type treeItem = {
   path: string
   label: string
   value?: number | string
@@ -42,7 +42,7 @@ interface AddFetchRowProps {
   data: treeItems
   showFavorites: boolean
   show?: boolean
-  searchTerm?: string
+  filterTerm?: string
 }
 
 export const adaptValue = (
@@ -103,16 +103,16 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
         const hasChild = count > 0
         const path = item.path
         const isFavorite = favorites.indexOf(item.path) !== -1
-        const isSearch = !!props.searchTerm
-        const isOpen = item.isOpen || isSearch || props.showFavorites
+        const isFilterTerm = !!props.filterTerm
+        const isOpen = item.isOpen || isFilterTerm || props.showFavorites
         const isMethod = !hasChild && typeof item.value === 'undefined'
 
         let isVisible =
-          !props.searchTerm ||
-          (isSearch &&
-            (matchSearch(item.label, props.searchTerm) ||
-              matchSearch(item.path, props.searchTerm) ||
-              matchSearch(`${item.value}`, props.searchTerm)))
+          !props.filterTerm ||
+          (isFilterTerm &&
+            (matchSearch(item.label, props.filterTerm) ||
+              matchSearch(item.path, props.filterTerm) ||
+              matchSearch(`${item.value}`, props.filterTerm)))
 
         if (props.showFavorites) {
           isVisible = isFavorite && isVisible
@@ -134,13 +134,13 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                   }
                 )}
                 onClick={(): void => {
-                  if (hasChild && !isSearch) {
+                  if (hasChild && !isFilterTerm) {
                     setTreeData((items) => toggleTreeOpen(items, path))
                   }
                 }}
               >
                 <div className="col-auto" style={{ minWidth: 38 }}>
-                  {hasChild && !isSearch ? (
+                  {hasChild && !isFilterTerm ? (
                     <span
                       className="badge bg-bg-transparent text-secondary mr-1"
                       style={{ minWidth: 24 }}
@@ -206,7 +206,7 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                 data={item.items}
                 showFavorites={props.showFavorites}
                 show={item.isOpen}
-                searchTerm={props.searchTerm}
+                filterTerm={props.filterTerm}
               />
             ) : null}
           </React.Fragment>
@@ -328,7 +328,7 @@ export const FetchBrowser = (): JSX.Element => {
       return (
         <FetchRows
           data={treeData}
-          searchTerm={filterTerm}
+          filterTerm={filterTerm}
           showFavorites={showFavorites}
         />
       )
@@ -402,9 +402,12 @@ export const FetchBrowser = (): JSX.Element => {
             )
             if (stateOrMethod) {
               return (
-                <>
-                  <Details stateOrMethod={stateOrMethod} backUrl="/browser" />
-                </>
+                <Details
+                  jetPath={stateOrMethod.path}
+                  value={stateOrMethod.value}
+                  fetchOnly={stateOrMethod.fetchOnly}
+                  backUrl="/browser"
+                />
               )
             }
           }
