@@ -7,7 +7,6 @@ import { JetData, JetContext } from './contexts/Jet'
 import { Search, Favorite, FavoriteBorder } from './SVG-Icons'
 import { Link, NavLink, useLocation, Route } from 'react-router-dom'
 import { Details } from './Details'
-import ChipInput from 'material-ui-chip-input'
 
 interface treeFetchItems {
   [key: string]: JetData
@@ -214,13 +213,13 @@ export const JetSearch = (): JSX.Element => {
             <div className="card-body sticky-top bg-white border-bottom d-flex">
               <form>
                 <Search width={36} height={36} />
-                <ChipInput
+                {/* <ChipInput
                   onChange={(chip) => console.log(chip)}
                   placeholder={
                     containsAllOf.length === 0 ? 'Enter path fragments' : ''
                   }
                   value={containsAllOf}
-                />
+                /> */}
               </form>
               <div className="input-group">
                 <span className="input-group-text">
