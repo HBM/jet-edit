@@ -172,13 +172,7 @@ export const JetSearch = (): JSX.Element => {
   const dataCount = Object.keys(treeData).length
   const renderContent = () => {
     if (dataCount > 0) {
-      return (
-        <SearchRows
-          data={treeData}
-          filterTerm={filterTerm}
-          showFavorites={showFavorites}
-        />
-      )
+      return <SearchRows data={treeData} showFavorites={showFavorites} />
     } else if (containsAllOf.length === 0) {
       return (
         <div className="Info">
