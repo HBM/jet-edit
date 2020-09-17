@@ -7,6 +7,7 @@ import { JetData, JetContext } from './contexts/Jet'
 import { Search, Favorite, FavoriteBorder } from './SVG-Icons'
 import { Link, NavLink, useLocation, Route } from 'react-router-dom'
 import { Details } from './Details'
+import { InputTags } from './ui/InputTags'
 
 interface treeFetchItems {
   [key: string]: JetData
@@ -51,9 +52,9 @@ const SearchRows = (props: FaviretesRowsProps): JSX.Element => {
           <React.Fragment key={item.path}>
             {isVisible ? (
               <NavLink
-                to={{ pathname: `/favorites/${encodeURIComponent(item.path)}` }}
+                to={{ pathname: `/search/${encodeURIComponent(item.path)}` }}
                 replace={
-                  `/favorites/${encodeURIComponent(item.path)}` ===
+                  `/search/${encodeURIComponent(item.path)}` ===
                   location.pathname
                 }
                 role="button"
@@ -118,8 +119,7 @@ export const JetSearch = (): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const fetcher = useRef<jet.Fetcher>(null)
-  const [containsAllOf] = useState<string[]>([])
-  const [filterTerm, setSearchTerm] = useState('')
+  const [containsAllOf, setContainsAllOf] = useState<string[]>([])
   const [showFavorites, setShowFavorites] = useLocalStorage<boolean>(
     'showFavorites',
     false
@@ -165,10 +165,6 @@ export const JetSearch = (): JSX.Element => {
     }
   }, [context.peer, containsAllOf])
 
-  const onFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.currentTarget.value)
-  }
-
   const toggleShowFavorites = () => {
     setShowFavorites(!showFavorites)
   }
@@ -209,34 +205,21 @@ export const JetSearch = (): JSX.Element => {
       <div className="Split-left">
         {context.peer && context.peer.connected ? (
           <div className="card">
-            <h5 className="card-header">Filter</h5>
+            <h5 className="card-header">Search</h5>
             <div className="card-body sticky-top bg-white border-bottom d-flex">
-              <form>
-                <Search width={36} height={36} />
-                {/* <ChipInput
-                  onChange={(chip) => console.log(chip)}
+              <div className="input-group">
+                <InputTags
+                  icon={<Search />}
+                  iconClear="clear"
                   placeholder={
                     containsAllOf.length === 0 ? 'Enter path fragments' : ''
                   }
-                  value={containsAllOf}
-                /> */}
-              </form>
-              <div className="input-group">
-                <span className="input-group-text">
-                  <Search />
-                </span>
-                <input
-                  type="search"
-                  className="form-control"
-                  aria-label="Type and filter"
-                  placeholder="Type and filter"
-                  onChange={onFilter}
-                  value={filterTerm}
-                  disabled={dataCount === 0}
+                  onChange={(values) => setContainsAllOf(values)}
+                  values={containsAllOf}
                 />
               </div>
               <button
-                className="btn btn-outline-secondary text-nowrap ml-2"
+                className="btn btn-outline-secondary text-nowrap ml-2 mb-auto"
                 type="button"
                 onClick={toggleShowFavorites}
                 disabled={dataCount === 0}
