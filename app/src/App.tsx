@@ -14,7 +14,7 @@ const Index = (): JSX.Element => {
       <Header />
       <div className="main" role="main">
         <Switch>
-          <Route exact path="/" component={Connections} />
+          <Redirect exact from="/" to="/connections" />
           <Route path="/connections" component={Connections} />
           <Route path="/browser" component={FetchBrowser} />
           {/* <Route path="/search" component={JetSearch} /> */}
