@@ -1,5 +1,10 @@
 import { useState, Dispatch, SetStateAction, useEffect } from 'react'
 
+interface CustomEventDetail<S> {
+  key: string
+  value: S
+}
+
 const useLocalStorage = <S>(
   key: string,
   initialValue: S
@@ -14,19 +19,45 @@ const useLocalStorage = <S>(
   })
 
   useEffect(() => {
+    const value =
+      typeof storedValue === 'string'
+        ? storedValue
+        : JSON.stringify(storedValue)
     try {
-      localStorage.setItem(
-        key,
-        typeof storedValue === 'string'
-          ? storedValue
-          : JSON.stringify(storedValue)
-      )
+      localStorage.setItem(key, value)
     } catch (error) {
       console.log(error)
     }
   }, [storedValue])
 
-  return [storedValue, setStoredValue]
+  const setItem = <S>(value: S) => {
+    window.dispatchEvent(
+      new CustomEvent<CustomEventDetail<S>>('hbk-onstore', {
+        detail: { key, value: value }
+      })
+    )
+  }
+
+  const onStore = (event: CustomEventInit<CustomEventDetail<S>>) => {
+    if (event.type === 'hbk-onstore') {
+      if (event.detail && event.detail.key === key) {
+        if (
+          JSON.stringify(setStoredValue) !== JSON.stringify(event.detail.value)
+        ) {
+          setStoredValue(event.detail.value)
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('hbk-onstore', onStore)
+    return () => {
+      window.removeEventListener('hbk-onstore', onStore)
+    }
+  }, [])
+
+  return [storedValue, setItem]
 }
 
 export default useLocalStorage
