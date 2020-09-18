@@ -159,7 +159,7 @@ export const Connections = (): JSX.Element => {
           render={({ match }) => {
             if (match) {
               const lastConId = ctx.conID > -1 ? ctx.conID : 0
-              return <Redirect to={`/connections/${lastConId}`} />
+              return <Redirect to={`/connections/${lastConId + 1}`} />
             }
             return null
           }}
