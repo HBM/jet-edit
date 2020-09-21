@@ -1,9 +1,16 @@
-import { useState, Dispatch, SetStateAction, useEffect } from 'react'
+import { useState, Dispatch, useEffect, useRef } from 'react'
 
-const useLocalStorage = <S>(
-  key: string,
-  initialValue: S
-): [S, Dispatch<SetStateAction<S>>] => {
+interface CustomEventDetail<S> {
+  key: string
+  value: S
+}
+
+const CUSOTMEVENTKEY = 'hbk-onstore'
+
+const useLocalStorage = <S>(key: string, initialValue: S): [S, Dispatch<S>] => {
+  const customEvent = useRef(
+    new CustomEvent<CustomEventDetail<S>>(CUSOTMEVENTKEY)
+  )
   const [storedValue, setStoredValue] = useState<S>(() => {
     const lsValue = localStorage.getItem(key)
     try {
@@ -14,19 +21,44 @@ const useLocalStorage = <S>(
   })
 
   useEffect(() => {
+    const value =
+      typeof storedValue === 'string'
+        ? storedValue
+        : JSON.stringify(storedValue)
     try {
-      localStorage.setItem(
-        key,
-        typeof storedValue === 'string'
-          ? storedValue
-          : JSON.stringify(storedValue)
-      )
+      localStorage.setItem(key, value)
     } catch (error) {
       console.log(error)
     }
   }, [storedValue])
 
-  return [storedValue, setStoredValue]
+  const setItem = (value: S) => {
+    customEvent.current.initCustomEvent(CUSOTMEVENTKEY, true, false, {
+      key,
+      value
+    } as CustomEventDetail<S>)
+    window.dispatchEvent(customEvent.current)
+  }
+
+  const onStore = (event: Event) => {
+    if (event.type === CUSOTMEVENTKEY) {
+      const detail = (event as CustomEvent<CustomEventDetail<S>>).detail
+      if (detail && detail.key === key) {
+        if (JSON.stringify(setStoredValue) !== JSON.stringify(detail.value)) {
+          setStoredValue(detail.value)
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('hbk-onstore', onStore as EventListener)
+    return () => {
+      window.removeEventListener('hbk-onstore', onStore as EventListener)
+    }
+  }, [])
+
+  return [storedValue, setItem]
 }
 
 export default useLocalStorage
