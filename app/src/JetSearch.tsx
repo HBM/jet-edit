@@ -9,17 +9,20 @@ import { Link, NavLink, useLocation, Route } from 'react-router-dom'
 import { Details } from './Details'
 import { InputTags } from './ui/InputTags'
 
-interface treeFetchItems {
+export interface TreeFetchItems {
   [key: string]: JetData
 }
 
 interface FaviretesRowsProps {
-  data: treeFetchItems
+  data: TreeFetchItems
   showFavorites: boolean
+  urlPart: string
   filterTerm?: string
 }
 
-const SearchRows = (props: FaviretesRowsProps): JSX.Element => {
+const URL = '/search'
+
+export const Rowsfetch = (props: FaviretesRowsProps): JSX.Element => {
   const location = useLocation()
   const [favorites, setFavorites] = useLocalStorage<string[]>(
     storeFavorites,
@@ -52,9 +55,11 @@ const SearchRows = (props: FaviretesRowsProps): JSX.Element => {
           <React.Fragment key={item.path}>
             {isVisible ? (
               <NavLink
-                to={{ pathname: `/search/${encodeURIComponent(item.path)}` }}
+                to={{
+                  pathname: `${props.urlPart}/${encodeURIComponent(item.path)}`
+                }}
                 replace={
-                  `/search/${encodeURIComponent(item.path)}` ===
+                  `${props.urlPart}/${encodeURIComponent(item.path)}` ===
                   location.pathname
                 }
                 role="button"
@@ -115,7 +120,7 @@ const SearchRows = (props: FaviretesRowsProps): JSX.Element => {
 }
 
 export const JetSearch = (): JSX.Element => {
-  const [treeData, setTreeData] = useState<treeFetchItems>(Object)
+  const [treeData, setTreeData] = useState<TreeFetchItems>(Object)
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const fetcher = useRef<jet.Fetcher>(null)
@@ -172,7 +177,13 @@ export const JetSearch = (): JSX.Element => {
   const dataCount = Object.keys(treeData).length
   const renderContent = () => {
     if (dataCount > 0) {
-      return <SearchRows data={treeData} showFavorites={showFavorites} />
+      return (
+        <Rowsfetch
+          data={treeData}
+          showFavorites={showFavorites}
+          urlPart={URL}
+        />
+      )
     } else if (containsAllOf.length === 0) {
       return (
         <div className="Info">
@@ -242,7 +253,7 @@ export const JetSearch = (): JSX.Element => {
         )}
       </div>
       <Route
-        path="/search/:path"
+        path={`${URL}:path`}
         render={({ match }) => {
           if (match && match.params.path) {
             const decodePath = decodeURIComponent(match.params.path)
@@ -253,7 +264,7 @@ export const JetSearch = (): JSX.Element => {
                   jetPath={pathFound.path}
                   value={pathFound.value}
                   fetchOnly={pathFound.fetchOnly}
-                  backUrl="/search"
+                  backUrl={URL}
                 />
               )
             }

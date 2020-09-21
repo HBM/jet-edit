@@ -1,109 +1,22 @@
 import React, { useEffect, useContext, useState, useRef } from 'react'
 import jet from 'node-jet'
-import classnames from 'classnames'
 import useLocalStorage from './hooks/useLocalStorage'
-import { storeFavorites, adaptValue, matchSearch } from './FetchBrowser'
+import { storeFavorites } from './FetchBrowser'
 import { JetData, JetContext } from './contexts/Jet'
-import { Search, Favorite } from './SVG-Icons'
-import { Link, NavLink, useLocation, Route } from 'react-router-dom'
+import { Search } from './SVG-Icons'
+import { Link, Route } from 'react-router-dom'
 import { Details } from './Details'
+import { Rowsfetch, TreeFetchItems } from './JetSearch'
 
-interface treeFetchItems {
-  [key: string]: JetData
-}
-
-interface FaviretesRowsProps {
-  toggleFavorite: (path: string) => void
-  favorites: string[]
-  data: treeFetchItems
-  filterTerm?: string
-}
-
-const FavoritesRows = (props: FaviretesRowsProps): JSX.Element => {
-  const location = useLocation()
-  const isSearch = !!props.filterTerm
-
-  return (
-    <>
-      {Object.values(props.data).map((item) => {
-        const isMethod = typeof item.value === 'undefined'
-        const isVisible =
-          !props.filterTerm ||
-          (isSearch &&
-            (matchSearch(item.path, props.filterTerm) ||
-              matchSearch(`${item.value}`, props.filterTerm)))
-        return (
-          <React.Fragment key={item.path}>
-            {isVisible ? (
-              <NavLink
-                to={{ pathname: `/favorites/${encodeURIComponent(item.path)}` }}
-                replace={
-                  `/favorites/${encodeURIComponent(item.path)}` ===
-                  location.pathname
-                }
-                role="button"
-                className={classnames(
-                  'list-group-item d-flex justify-content-between align-items-center'
-                )}
-              >
-                <div className="col">
-                  <div className="font-weight-bold d-inline">{item.path}</div>
-                  <samp
-                    className="font-monospace font-weight-lighter text-wrap d-inline"
-                    style={{ fontSize: '0.8rem' }}
-                  >
-                    {item.value && adaptValue(item.value)}
-                  </samp>
-                </div>
-                <div className="col-auto">
-                  {isMethod ? (
-                    <span
-                      className="badge bg-warning bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="Method"
-                    >
-                      M
-                    </span>
-                  ) : (
-                    <span
-                      className="badge bg-info bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="State"
-                    >
-                      S
-                    </span>
-                  )}
-                  <span
-                    className="ml-1"
-                    onClick={(
-                      event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-                    ): void => {
-                      event.preventDefault()
-                      props.toggleFavorite(item.path)
-                    }}
-                  >
-                    <Favorite style={{ fill: 'var(--bs-red)' }} />
-                  </span>
-                </div>
-              </NavLink>
-            ) : null}
-          </React.Fragment>
-        )
-      })}
-    </>
-  )
-}
+const URL = '/favorites'
 
 export const Favorites = (): JSX.Element => {
-  const [treeData, setTreeData] = useState<treeFetchItems>(Object)
+  const [treeData, setTreeData] = useState<TreeFetchItems>(Object)
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const fetcher = useRef<jet.Fetcher>(null)
   const [filterTerm, setSearchTerm] = useState('')
-  const [favorites, setFavorites] = useLocalStorage<string[]>(
-    storeFavorites,
-    []
-  )
+  const [favorites] = useLocalStorage<string[]>(storeFavorites, [])
   const context = useContext(JetContext)
   const fetch = async () => {
     if (context.peer) {
@@ -144,14 +57,6 @@ export const Favorites = (): JSX.Element => {
     }
   }, [context.peer, favorites])
 
-  const toggleFavorite = (path: string) => {
-    if (favorites.indexOf(path) === -1) {
-      setFavorites([...favorites, path].sort())
-    } else {
-      setFavorites(favorites.filter((item) => item !== path))
-    }
-  }
-
   const onFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.currentTarget.value)
   }
@@ -159,11 +64,11 @@ export const Favorites = (): JSX.Element => {
   const renderContent = () => {
     if (Object.keys(treeData).length > 0) {
       return (
-        <FavoritesRows
+        <Rowsfetch
           data={treeData}
           filterTerm={filterTerm}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
+          urlPart={URL}
+          showFavorites={true}
         />
       )
     } else if (favorites.length === 0) {
@@ -229,7 +134,7 @@ export const Favorites = (): JSX.Element => {
         )}
       </div>
       <Route
-        path="/favorites/:path"
+        path={`${URL}:path`}
         render={({ match }) => {
           if (match && match.params.path) {
             const decodePath = decodeURIComponent(match.params.path)
@@ -240,7 +145,7 @@ export const Favorites = (): JSX.Element => {
                   jetPath={pathFound.path}
                   value={pathFound.value}
                   fetchOnly={pathFound.fetchOnly}
-                  backUrl="/favorites"
+                  backUrl={URL}
                 />
               )
             }
