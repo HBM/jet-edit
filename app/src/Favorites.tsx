@@ -73,7 +73,7 @@ export const Favorites = (): JSX.Element => {
       )
     } else if (favorites.length === 0) {
       return (
-        <div className="Info">
+        <div className="p-3">
           <h3>Your favorites list is empty</h3>
           <span>
             You can add favorites from the <Link to="/search">search</Link>{' '}
@@ -83,7 +83,7 @@ export const Favorites = (): JSX.Element => {
       )
     } else {
       return (
-        <div className="Info">
+        <div className="p-3">
           <h3>None of your favorites is available</h3>
           <span>There are your favorites:</span>
           <ul>

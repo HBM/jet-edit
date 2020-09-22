@@ -150,6 +150,7 @@ export const JetSearch = (): JSX.Element => {
     'showFavorites',
     false
   )
+  const [favorites] = useLocalStorage<string[]>(storeFavorites, [])
 
   const context = useContext(JetContext)
   const fetch = async () => {
@@ -198,6 +199,28 @@ export const JetSearch = (): JSX.Element => {
   const dataCount = Object.keys(treeData).length
   const renderContent = () => {
     if (dataCount > 0) {
+      if (showFavorites && favorites.length === 0) {
+        return (
+          <div className="p-3">
+            <h3>Your favorites list is empty</h3>
+            <span>Click on the heart to deactivate it</span>
+            <button
+              className="btn btn-outline-secondary text-nowrap ml-2 mb-auto"
+              type="button"
+              onClick={toggleShowFavorites}
+              disabled={dataCount === 0}
+              title={showFavorites ? 'Hide Favorites' : 'Show Favorites'}
+            >
+              {showFavorites ? (
+                <Favorite style={{ fill: 'var(--bs-red)' }} />
+              ) : (
+                <FavoriteBorder />
+              )}
+            </button>
+          </div>
+        )
+      }
+
       return (
         <Rowsfetch
           data={treeData}
@@ -207,13 +230,13 @@ export const JetSearch = (): JSX.Element => {
       )
     } else if (containsAllOf.length === 0) {
       return (
-        <div className="Info">
+        <div className="p-3">
           <h3>Your search list is empty</h3>
         </div>
       )
     } else {
       return (
-        <div className="Info">
+        <div className="p-3">
           <h3>None of your search is available</h3>
           <span>There are your search list:</span>
           <ul>

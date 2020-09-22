@@ -334,7 +334,7 @@ export const FetchBrowser = (): JSX.Element => {
       )
     } else {
       return (
-        <div className="Info">
+        <div className="p-3">
           <h3>No data available</h3>
         </div>
       )
