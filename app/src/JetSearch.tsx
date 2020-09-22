@@ -1,13 +1,13 @@
 import React, { useEffect, useContext, useState, useRef } from 'react'
 import jet from 'node-jet'
-import classnames from 'classnames'
-import useLocalStorage from './hooks/useLocalStorage'
 import { storeFavorites, adaptValue, matchSearch } from './FetchBrowser'
 import { JetData, JetContext } from './contexts/Jet'
 import { Search, Favorite, FavoriteBorder } from './SVG-Icons'
 import { Link, NavLink, useLocation, Route } from 'react-router-dom'
 import { Details } from './Details'
 import { InputTags } from './ui/InputTags'
+import useLocalStorage from './hooks/useLocalStorage'
+import ReactVisibilitySensor from 'react-visibility-sensor'
 
 export interface TreeFetchItems {
   [key: string]: JetData
@@ -24,6 +24,7 @@ const URL = '/search'
 
 export const Rowsfetch = (props: FaviretesRowsProps): JSX.Element => {
   const location = useLocation()
+  const [to, setTo] = useState(20)
   const [favorites, setFavorites] = useLocalStorage<string[]>(
     storeFavorites,
     []
@@ -37,84 +38,104 @@ export const Rowsfetch = (props: FaviretesRowsProps): JSX.Element => {
       setFavorites(favorites.filter((item) => item !== path))
     }
   }
+  useEffect(() => {
+    if (props.showFavorites) {
+      setTo(Object.values(props.data).length)
+    } else {
+      setTo(20)
+    }
+  }, [props.showFavorites, Object.values(props.data).length])
+
+  const values = Object.values(props.data)
   return (
     <>
-      {Object.values(props.data).map((item) => {
-        const isFavorite = favorites.indexOf(item.path) !== -1
-        const isMethod = typeof item.value === 'undefined'
-        let isVisible =
-          !props.filterTerm ||
-          (isFilterTerm &&
-            (matchSearch(item.path, props.filterTerm) ||
-              matchSearch(`${item.value}`, props.filterTerm)))
+      {values
+        .filter((_, index) => index >= 0 && index < to)
+        .map((item) => {
+          const isFavorite = favorites.indexOf(item.path) !== -1
+          const isMethod = typeof item.value === 'undefined'
+          let isVisibleSearchFilter =
+            !props.filterTerm ||
+            (isFilterTerm &&
+              (matchSearch(item.path, props.filterTerm) ||
+                matchSearch(`${item.value}`, props.filterTerm)))
 
-        if (props.showFavorites) {
-          isVisible = isFavorite && isVisible
-        }
-        return (
-          <React.Fragment key={item.path}>
-            {isVisible ? (
-              <NavLink
-                to={{
-                  pathname: `${props.urlPart}/${encodeURIComponent(item.path)}`
-                }}
-                replace={
-                  `${props.urlPart}/${encodeURIComponent(item.path)}` ===
-                  location.pathname
-                }
-                role="button"
-                className={classnames(
-                  'list-group-item d-flex justify-content-between align-items-center'
-                )}
-              >
-                <div className="col">
-                  <div className="font-weight-bold d-inline">{item.path}</div>
-                  <samp
-                    className="font-monospace font-weight-lighter text-wrap d-inline"
-                    style={{ fontSize: '0.8rem' }}
-                  >
-                    {item.value && adaptValue(item.value)}
-                  </samp>
-                </div>
-                <div className="col-auto">
-                  {isMethod ? (
-                    <span
-                      className="badge bg-warning bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="Method"
+          if (props.showFavorites) {
+            isVisibleSearchFilter = isFavorite && isVisibleSearchFilter
+          }
+          return (
+            <React.Fragment key={item.path}>
+              {isVisibleSearchFilter ? (
+                <NavLink
+                  to={{
+                    pathname: `${props.urlPart}/${encodeURIComponent(
+                      item.path
+                    )}`
+                  }}
+                  replace={
+                    `${props.urlPart}/${encodeURIComponent(item.path)}` ===
+                    location.pathname
+                  }
+                  role="button"
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  <div className="col">
+                    <div className="font-weight-bold d-inline">{item.path}</div>
+                    <samp
+                      className="font-monospace font-weight-lighter text-wrap d-inline"
+                      style={{ fontSize: '0.8rem' }}
                     >
-                      M
-                    </span>
-                  ) : (
-                    <span
-                      className="badge bg-info bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="State"
-                    >
-                      S
-                    </span>
-                  )}
-                  <span
-                    className="ml-1"
-                    onClick={(
-                      event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-                    ): void => {
-                      event.preventDefault()
-                      toggleFavorite(item.path)
-                    }}
-                  >
-                    {isFavorite ? (
-                      <Favorite style={{ fill: 'var(--bs-red)' }} />
+                      {item.value && adaptValue(item.value)}
+                    </samp>
+                  </div>
+                  <div className="col-auto">
+                    {isMethod ? (
+                      <span
+                        className="badge bg-warning bg-gradient"
+                        style={{ minWidth: 24 }}
+                        title="Method"
+                      >
+                        M
+                      </span>
                     ) : (
-                      <FavoriteBorder />
+                      <span
+                        className="badge bg-info bg-gradient"
+                        style={{ minWidth: 24 }}
+                        title="State"
+                      >
+                        S
+                      </span>
                     )}
-                  </span>
-                </div>
-              </NavLink>
-            ) : null}
-          </React.Fragment>
-        )
-      })}
+                    <span
+                      className="ml-1"
+                      onClick={(
+                        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                      ): void => {
+                        event.preventDefault()
+                        toggleFavorite(item.path)
+                      }}
+                    >
+                      {isFavorite ? (
+                        <Favorite style={{ fill: 'var(--bs-red)' }} />
+                      ) : (
+                        <FavoriteBorder />
+                      )}
+                    </span>
+                  </div>
+                </NavLink>
+              ) : null}
+            </React.Fragment>
+          )
+        })}
+      <ReactVisibilitySensor
+        onChange={(isVisible) => {
+          if (isVisible && !props.showFavorites) {
+            setTo((to) => to + 5)
+          }
+        }}
+      >
+        <div>{values.length > to ? 'Show more...' : ''}</div>
+      </ReactVisibilitySensor>
     </>
   )
 }
@@ -253,7 +274,7 @@ export const JetSearch = (): JSX.Element => {
         )}
       </div>
       <Route
-        path={`${URL}:path`}
+        path={`${URL}/:path`}
         render={({ match }) => {
           if (match && match.params.path) {
             const decodePath = decodeURIComponent(match.params.path)

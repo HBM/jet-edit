@@ -134,7 +134,7 @@ export const Favorites = (): JSX.Element => {
         )}
       </div>
       <Route
-        path={`${URL}:path`}
+        path={`${URL}/:path`}
         render={({ match }) => {
           if (match && match.params.path) {
             const decodePath = decodeURIComponent(match.params.path)
