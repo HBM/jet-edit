@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import jet from 'node-jet'
-import { ToastContext } from './Toast'
+import { ToastContext } from './Toasts'
 import useLocalStorage from '../hooks/useLocalStorage'
 
 export interface JetData {

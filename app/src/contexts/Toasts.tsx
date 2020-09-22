@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Toast } from 'react-bootstrap'
+import { Toast as ReactToast } from 'react-bootstrap'
 
 const MessageType = {
   success: 'Success',
@@ -49,7 +49,7 @@ export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
           }}
         >
           {toastItems.map((it) => (
-            <Toast
+            <ReactToast
               key={it.id}
               onClose={() =>
                 setToastItems((parts) =>
@@ -59,13 +59,13 @@ export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
               delay={props.timeout}
               autohide
             >
-              <Toast.Header style={{ minWidth: 250 }}>
+              <ReactToast.Header style={{ minWidth: 250 }}>
                 <strong className={`mr-auto text-${it.type}`}>
                   {MessageType[it.type]}
                 </strong>
-              </Toast.Header>
-              <Toast.Body>{it.text}</Toast.Body>
-            </Toast>
+              </ReactToast.Header>
+              <ReactToast.Body>{it.text}</ReactToast.Body>
+            </ReactToast>
           ))}
         </div>
       ) : null}
