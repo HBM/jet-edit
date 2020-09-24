@@ -131,7 +131,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                     className="form-control w-50"
                     id="inputWsUrl"
                     aria-describedby="WebsocketURL"
-                    placeholder="jetbus.io:8080"
+                    placeholder="jetbus.io:11123/api/jet/"
                     onChange={(ev) => {
                       const value = ev.currentTarget.value
                       const error = !isValidWebSocketUrl(
