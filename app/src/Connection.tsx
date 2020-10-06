@@ -70,7 +70,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
         <div className="card-header">
           <span>Connection #{displayIndex}</span>
           <Link
-            to="/connections"
+            to="/connections/all"
             className="float-right d-lg-none"
             aria-label="Close"
           >

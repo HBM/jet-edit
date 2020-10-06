@@ -216,6 +216,26 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
   )
 }
 
+const removeData = (_last: treeItems, _path: string): boolean => {
+  let findRemove = false
+  for (let index = 0; index < _last.length; index++) {
+    const element = _last[index]
+    if (_path === element.path) {
+      _last.splice(index, 1)
+      return true
+    } else if (_path.startsWith(element.path)) {
+      findRemove = removeData(element.items, _path)
+      if (findRemove) {
+        if (element.items.length === 0) {
+          _last.splice(index, 1)
+        }
+        return true
+      }
+    }
+  }
+  return false
+}
+
 const addData = (
   _last: treeItems,
   _parentPath: string,
@@ -296,10 +316,17 @@ export const FetchBrowser = (): JSX.Element => {
     .path('containsAllOf', [''])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on('data', (data: JetData) => {
-      setTreeData((items) => {
-        const updateData = addData(items, '', data.path.split('/'), data)
-        return [...updateData]
-      })
+      if (data.event !== 'remove') {
+        setTreeData((items) => {
+          const updateData = addData(items, '', data.path.split('/'), data)
+          return [...updateData]
+        })
+      } else {
+        setTreeData((items) => {
+          removeData(items, data.path)
+          return [...items]
+        })
+      }
     })
 
   useEffect(() => {
@@ -310,7 +337,9 @@ export const FetchBrowser = (): JSX.Element => {
     }
     return () => {
       if (context.peer) {
-        context.peer.unfetch(fetcher)
+        context.peer
+          .unfetch(fetcher)
+          .catch(() => context.connectionFailure(context.conID))
       }
     }
   }, [context.peer])

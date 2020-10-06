@@ -32,14 +32,22 @@ export const Favorites = (): JSX.Element => {
         .path('equalsOneOf', favorites)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('data', (data: JetData) => {
-          setTreeData((items) => ({
-            ...items,
-            [data.path]: {
-              path: data.path,
-              value: data.value,
-              fetchOnly: data.fetchOnly
-            }
-          }))
+          if (data.event !== 'remove') {
+            setTreeData((items) => ({
+              ...items,
+              [data.path]: {
+                path: data.path,
+                value: data.value,
+                fetchOnly: data.fetchOnly
+              }
+            }))
+          } else {
+            setTreeData((items) => {
+              const cpItems = { ...items }
+              delete cpItems[data.path]
+              return cpItems
+            })
+          }
         })
 
       peer
@@ -52,7 +60,9 @@ export const Favorites = (): JSX.Element => {
     fetch()
     return () => {
       if (context.peer) {
-        context.peer.unfetch(fetcher.current)
+        context.peer
+          .unfetch(fetcher.current)
+          .catch(() => context.connectionFailure(context.conID))
       }
     }
   }, [context.peer, favorites])

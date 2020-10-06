@@ -7,6 +7,7 @@ export interface JetData {
   path: string
   value: string | number
   fetchOnly?: boolean
+  event: 'change' | 'add' | 'remove'
 }
 
 export interface JetPeerInterface {
@@ -143,6 +144,8 @@ export const JetProvider = (props: JetProviderProps): JSX.Element => {
         'danger',
         `Connection to '${url}' failed: Error in connection establishment`
       )
+      setPeer(undefined)
+      setCurrConnID(-1)
     },
     connectionRemove: async (index) => {
       if (currConnID === index) {

@@ -10,7 +10,7 @@ import useLocalStorage from './hooks/useLocalStorage'
 import ReactVisibilitySensor from 'react-visibility-sensor'
 
 export interface TreeFetchItems {
-  [key: string]: JetData
+  [key: string]: Omit<JetData, 'event'>
 }
 
 interface FaviretesRowsProps {
@@ -167,14 +167,22 @@ export const JetSearch = (): JSX.Element => {
         .path('containsAllOf', containsAllOf)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .on('data', (data: JetData) => {
-          setTreeData((items) => ({
-            ...items,
-            [data.path]: {
-              path: data.path,
-              value: data.value,
-              fetchOnly: data.fetchOnly
-            }
-          }))
+          if (data.event !== 'remove') {
+            setTreeData((items) => ({
+              ...items,
+              [data.path]: {
+                path: data.path,
+                value: data.value,
+                fetchOnly: data.fetchOnly
+              }
+            }))
+          } else {
+            setTreeData((items) => {
+              const cpItems = { ...items }
+              delete cpItems[data.path]
+              return cpItems
+            })
+          }
         })
 
       peer
@@ -187,7 +195,9 @@ export const JetSearch = (): JSX.Element => {
     fetch()
     return () => {
       if (context.peer) {
-        context.peer.unfetch(fetcher.current)
+        context.peer
+          .unfetch(fetcher.current)
+          .catch(() => context.connectionFailure(context.conID))
       }
     }
   }, [context.peer, containsAllOf])
