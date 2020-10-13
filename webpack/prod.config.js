@@ -6,6 +6,7 @@ const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const webpack = require('webpack')
 const packagejson = require('../package.json')
+const { execSync } = require('child_process')
 
 const basePath = path.join(__dirname, '..')
 const hash = execSync('git rev-parse --short HEAD').toString()
