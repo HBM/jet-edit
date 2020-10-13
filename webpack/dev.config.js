@@ -64,5 +64,11 @@ module.exports = {
       template: 'index.html',
       favicon: 'favicon.ico'
     })
-  ]
+  ],
+  performance: {
+    hints: false
+  },
+  optimization: {
+    usedExports: true
+  }
 }
