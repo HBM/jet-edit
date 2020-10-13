@@ -3,8 +3,12 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const StyleLintPlugin = require('stylelint-webpack-plugin')
+const { execSync } = require('child_process')
+const webpack = require('webpack')
+const packagejson = require('../package.json')
 
 const basePath = path.join(__dirname, '..')
+const hash = execSync('git rev-parse --short HEAD').toString()
 
 module.exports = {
   mode: 'development',
@@ -63,6 +67,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'index.html',
       favicon: 'favicon.ico'
+    }),
+    new webpack.DefinePlugin({
+      __WEBPACK_HASH__: JSON.stringify(hash),
+      __WEBPACK_PACKAGEJSON_VERSION: JSON.stringify(packagejson.version)
     })
   ],
   performance: {

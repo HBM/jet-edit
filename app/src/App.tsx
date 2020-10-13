@@ -7,7 +7,11 @@ import { Connections } from './Connections'
 import { FetchBrowser } from './FetchBrowser'
 import { JetSearch } from './JetSearch'
 
+declare let __WEBPACK_HASH__: string
+declare let __WEBPACK_PACKAGEJSON_VERSION: string
+
 const Index = (): JSX.Element => {
+  document.title = `jet-edit[v${__WEBPACK_PACKAGEJSON_VERSION}/#${__WEBPACK_HASH__}]`
   return (
     <>
       <Header />

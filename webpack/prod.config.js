@@ -4,8 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 // const CompressionPlugin = require('compression-webpack-plugin')
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const webpack = require('webpack')
+const packagejson = require('../package.json')
 
 const basePath = path.join(__dirname, '..')
+const hash = execSync('git rev-parse --short HEAD').toString()
 
 module.exports = {
   mode: 'production',
@@ -51,6 +54,10 @@ module.exports = {
     path: path.join(basePath, '/dist')
   },
   plugins: [
+    new webpack.DefinePlugin({
+      __WEBPACK_HASH__: JSON.stringify(hash),
+      __WEBPACK_PACKAGEJSON_VERSION: JSON.stringify(packagejson.version)
+    }),
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash].css'
     }),
