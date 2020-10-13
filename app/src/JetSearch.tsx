@@ -5,7 +5,7 @@ import { JetData, JetContext } from './contexts/Jet'
 import { Search, Favorite, FavoriteBorder } from './SVG-Icons'
 import { Link, NavLink, useLocation, Route } from 'react-router-dom'
 import { Details } from './Details'
-import { InputTags } from './ui/InputTags'
+import { InputTags } from 'react-bootstrap-tagsinput'
 import useLocalStorage from './hooks/useLocalStorage'
 import ReactVisibilitySensor from 'react-visibility-sensor'
 
@@ -267,15 +267,26 @@ export const JetSearch = (): JSX.Element => {
             <h5 className="card-header">Search</h5>
             <div className="card-body sticky-top bg-white border-bottom d-flex">
               <div className="input-group">
+                <span className="input-group-text">
+                  <Search />
+                </span>
                 <InputTags
-                  icon={<Search />}
-                  iconClear="clear"
                   placeholder={
                     containsAllOf.length === 0 ? 'Enter path fragments' : ''
                   }
-                  onChange={(values) => setContainsAllOf(values)}
+                  onTags={(value) => setContainsAllOf(value.values)}
                   values={containsAllOf}
                 />
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  id="button-clearAll"
+                  onClick={() => {
+                    setContainsAllOf([])
+                  }}
+                >
+                  clear
+                </button>
               </div>
               <button
                 className="btn btn-outline-secondary text-nowrap ml-2 mb-auto"
