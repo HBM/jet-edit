@@ -18,7 +18,7 @@
   },
   "scripts": {
     "clean": "rm -fr dist test-builds coverage",
-    "test": "npm run clean && node node_modules/typescript/bin/tsc --project tsconfig.json --outDir \"./test-builds/\" --sourceMap && node node_modules/jest/bin/jest.js --coverage",
+    "test": "npm run clean && node node_modules/typescript/bin/tsc --project tsconfig.test.json && node node_modules/jest/bin/jest.js --coverage",
     "tsc": "node node_modules/typescript/bin/tsc --project tsconfig.json --noEmit",
     "bundle": "npm run clean && node node_modules/webpack/bin/webpack.js --config webpack/prod.config.js",
     "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack/dev.config.js",

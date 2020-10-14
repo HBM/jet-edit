@@ -6,8 +6,8 @@ describe('useLocalStorage hook', (): void => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Component = ({ lsVal }: { lsVal: any }): JSX.Element => {
     const [test] = useLocalStorage('storageKey', lsVal)
-
-    return <div>{typeof test === 'object' ? JSON.stringify(test) : test}</div>
+    const value = typeof test === 'object' ? JSON.stringify(test) : test
+    return <div>{value}</div>
   }
 
   it('should return a string', (): void => {

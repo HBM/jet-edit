@@ -1,6 +1,6 @@
 coverage
 dist
-test-builds
+compiled
 node_modules
 .vscode
 package-lock.json
