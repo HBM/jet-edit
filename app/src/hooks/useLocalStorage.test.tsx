@@ -28,9 +28,7 @@ describe('useLocalStorage hook', (): void => {
     localStorage.clear()
   })
 
-  it('should return null string on initial null value', async (): Promise<
-    void
-  > => {
+  it('should return null string on initial null value', async (): Promise<void> => {
     const testVal = null
     const { getByText } = render(<Component lsVal={testVal} />)
     getByText('null')
@@ -39,9 +37,7 @@ describe('useLocalStorage hook', (): void => {
     localStorage.clear()
   })
 
-  it('should log the error when setting an item fails', async (done): Promise<
-    void
-  > => {
+  it('should log the error when setting an item fails', async (done): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).console.log = (): void => {
       done()
