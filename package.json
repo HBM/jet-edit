@@ -18,15 +18,15 @@
   },
   "scripts": {
     "clean": "rm -fr dist test-builds coverage",
-    "test": "npm run clean && node node_modules/typescript/bin/tsc --project tsconfig.test.json && node node_modules/jest/bin/jest.js --coverage",
-    "tsc": "node node_modules/typescript/bin/tsc --project tsconfig.json --noEmit",
-    "bundle": "npm run clean && node node_modules/webpack/bin/webpack.js --config webpack/prod.config.js",
-    "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack/dev.config.js",
-    "prettier": "node node_modules/prettier/bin-prettier.js --write \"./**/*.{js,jsx,ts,tsx,json,html}\"",
-    "prettier:ci": "node node_modules/prettier/bin-prettier.js --list-different \"./**/*.{js,jsx,ts,tsx,json,html}\"",
-    "eslint": "node node_modules/eslint/bin/eslint.js --max-warnings 0 \"{app,tests}/**/*.{js,jsx,ts,tsx}\"",
-    "stylelint:ci": "node node_modules/stylelint/bin/stylelint.js \"app/**/*.scss\"",
-    "stylelint": "node node_modules/stylelint/bin/stylelint.js --fix \"app/**/*.scss\""
+    "test": "npm run clean && tsc --project tsconfig.test.json && jest --coverage",
+    "tsc": "tsc --project tsconfig.json --noEmit",
+    "bundle": "npm run clean && cross-env NODE_ENV=production webpack --config webpack/prod.config.js",
+    "dev": "cross-env NODE_ENV=development webpack serve --config webpack/dev.config.js",
+    "prettier": "prettier --write \"./**/*.{js,jsx,ts,tsx,json,html}\"",
+    "prettier:ci": "prettier --list-different \"./**/*.{js,jsx,ts,tsx,json,html}\"",
+    "eslint": "eslint --max-warnings 0 \"{app,tests}/**/*.{js,jsx,ts,tsx}\"",
+    "stylelint:ci": "stylelint \"app/**/*.scss\"",
+    "stylelint": "stylelint --fix \"app/**/*.scss\""
   },
   "devDependencies": {
     "@testing-library/react": "^11.0.4",
@@ -42,6 +42,7 @@
     "@typescript-eslint/parser": "^4.4.1",
     "autoprefixer": "^9.8.6",
     "compression-webpack-plugin": "^6.0.3",
+    "cross-env": "^7.0.3",
     "css-loader": "^4.3.0",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "eslint": "^7.11.0",
