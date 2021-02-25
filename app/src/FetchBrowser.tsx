@@ -59,7 +59,7 @@ export const adaptValue = (
     }
     content = fields.map((field) => {
       return flat && flat[field] !== undefined ? (
-        <span className="State-field mr-1" key={field}>
+        <span className="State-field me-1" key={field}>
           {field}:{JSON.stringify(flat[field])}
         </span>
       ) : null
@@ -139,7 +139,7 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                 <div className="col-auto" style={{ minWidth: 38 }}>
                   {hasChild && !isFilterTerm ? (
                     <span
-                      className="badge bg-bg-transparent text-secondary mr-1"
+                      className="badge bg-bg-transparent text-secondary me-1"
                       style={{ minWidth: 24 }}
                       onClick={(): void => {
                         setTreeData((items) => toggleTreeOpen(items, path))
@@ -179,13 +179,13 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                     )
                   ) : null}
                   {hasChild ? (
-                    <span className="ml-1 badge bg-secondary rounded-pill">
+                    <span className="ms-1 badge bg-secondary rounded-pill">
                       {count}
                     </span>
                   ) : null}
                   {hasChild ? null : (
                     <span
-                      className="ml-1"
+                      className="ms-1"
                       onClick={(
                         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
                       ): void => {
@@ -392,7 +392,7 @@ export const FetchBrowser = (): JSX.Element => {
                 />
               </div>
               <button
-                className="btn btn-outline-secondary text-nowrap ml-2"
+                className="btn btn-outline-secondary text-nowrap ms-2"
                 type="button"
                 onClick={toggleShowFavorites}
                 disabled={treeData.length === 0}

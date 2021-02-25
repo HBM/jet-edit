@@ -60,7 +60,7 @@ export const ToastProvider = (props: ToastProviderPropsTypes): JSX.Element => {
               autohide
             >
               <ReactToast.Header style={{ minWidth: 250 }}>
-                <strong className={`mr-auto text-${it.type}`}>
+                <strong className={`me-auto text-${it.type}`}>
                   {MessageType[it.type]}
                 </strong>
               </ReactToast.Header>

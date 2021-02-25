@@ -107,7 +107,7 @@ export const Rowsfetch = (props: FaviretesRowsProps): JSX.Element => {
                       </span>
                     )}
                     <span
-                      className="ml-1"
+                      className="ms-1"
                       onClick={(
                         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
                       ): void => {
@@ -215,7 +215,7 @@ export const JetSearch = (): JSX.Element => {
             <h3>Your favorites list is empty</h3>
             <span>Click on the heart to deactivate it</span>
             <button
-              className="btn btn-outline-secondary text-nowrap ml-2 mb-auto"
+              className="btn btn-outline-secondary text-nowrap ms-2 mb-auto"
               type="button"
               onClick={toggleShowFavorites}
               disabled={dataCount === 0}
@@ -289,7 +289,7 @@ export const JetSearch = (): JSX.Element => {
                 </button>
               </div>
               <button
-                className="btn btn-outline-secondary text-nowrap ml-2 mb-auto"
+                className="btn btn-outline-secondary text-nowrap ms-2 mb-auto"
                 type="button"
                 onClick={toggleShowFavorites}
                 disabled={dataCount === 0}

@@ -22,7 +22,7 @@ const createInput = (
     case 'boolean': {
       return (
         <TypedInput
-          className="mb-2 row"
+          className="mb-2"
           disabled={disabled}
           name={nvp.name}
           value={nvp.value}
