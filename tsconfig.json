@@ -1,30 +1,21 @@
 {
   "compilerOptions": {
-    /* Basic/Project Options */
-    // "baseUrl": "app",
-    "baseUrl": "app",
     "target": "ESNext",
     "module": "CommonJS",
-    "outDir": "./dist/",
-    "composite": true,
-    "lib": ["ES2015", "ESNext", "DOM"],
-    "jsx": "react",
     "allowJs": true,
     "checkJs": true,
+    "jsx": "react",
+    "outDir": "./dist/",
     "strict": true,
-    "skipLibCheck": true,
     "noImplicitAny": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "types": ["jest", "node", "react"],
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "removeComments": true,
     "sourceMap": true
   },
-  /* File Inclusion */
   "include": ["app/**/*"],
   "exclude": ["node_modules"]
 }

@@ -17,12 +17,18 @@ module.exports = merge(common, {
     disableHostCheck: true,
     historyApiFallback: true,
     // host: '0.0.0.0',
-    open: true,
+    // open: true,
     hot: true
   },
 
-  plugins: [
-    // Only update what has changed on hot reload
-    new webpack.HotModuleReplacementPlugin()
-  ]
+  // plugins: [
+  //   // Only update what has changed on hot reload
+  //   new webpack.HotModuleReplacementPlugin()
+  // ],
+  performance: {
+    hints: false
+  },
+  optimization: {
+    usedExports: true
+  }
 })

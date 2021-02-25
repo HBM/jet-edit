@@ -16,18 +16,6 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css'
     }),
-    // new HtmlWebpackPlugin({
-    //   hash: true,
-    //   minify: {
-    //     removeComments: true,
-    //     collapseBooleanAttributes: true,
-    //     collapseWhitespace: true,
-    //     removeRedundantAttributes: true,
-    //     minifyJS: true,
-    //     minifyCSS: true,
-    //     minifyURLs: true
-    //   }
-    // }),
     new CompressionPlugin({
       deleteOriginalAssets: true,
       test: /\.js$|\.css$|\.html$/

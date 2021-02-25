@@ -5,6 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const StyleLintPlugin = require('stylelint-webpack-plugin')
+const packagejson = require('../package.json')
 
 const hash = require('child_process')
   .execSync('git rev-parse --short HEAD')
@@ -18,14 +19,10 @@ module.exports = {
   entry: {
     app: './index.tsx'
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.json', '.css', '.scss', '.html']
-  },
   // Where webpack outputs the assets and bundles
   output: {
     path: paths.build,
-    filename: '[name].[contenthash:8].bundle.js',
-    publicPath: '/'
+    filename: '[name].[contenthash:8].js'
   },
 
   // Customize the webpack build process
@@ -33,15 +30,11 @@ module.exports = {
     new StyleLintPlugin({
       fix: true
     }),
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-      process: 'process'
-    }),
     // Removes/cleans build folders and unused assets when rebuilding
     new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
-      __WEBPACK_DATE__: JSON.stringify(new Date()),
-      __WEBPACK_HASH__: JSON.stringify(hash)
+      __WEBPACK_HASH__: JSON.stringify(hash),
+      __WEBPACK_PACKAGEJSON_VERSION: JSON.stringify(packagejson.version)
     }),
 
     // Generates an HTML file from a template
@@ -68,7 +61,7 @@ module.exports = {
       },
       // Styles: Inject CSS into the head with source maps
       {
-        test: /\.(scss|css)$/,
+        test: /\.s[ac]ss$/i,
         use: [
           isDevMode ? 'style-loader' : MiniCssExtractPlugin.loader,
           {
@@ -101,8 +94,8 @@ module.exports = {
   // https://github.com/webpack/webpack/blob/master/lib/ModuleNotFoundError.js
   resolve: {
     alias: {
-      assert: require.resolve('assert/'),
-      process: require.resolve('process/browser')
-    }
+      util: require.resolve('util/')
+    },
+    extensions: ['.tsx', '.ts', '.js', '.json']
   }
 }
