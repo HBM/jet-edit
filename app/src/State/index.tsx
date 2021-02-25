@@ -22,7 +22,7 @@ const createInput = (
     case 'boolean': {
       return (
         <TypedInput
-          className="mb-3 row"
+          className="mb-2 row"
           disabled={disabled}
           name={nvp.name}
           value={nvp.value}
@@ -35,7 +35,7 @@ const createInput = (
     }
     case 'number': {
       return (
-        <div className="mb-3 row" key={nvp.name}>
+        <div className="mb-2 row" key={nvp.name}>
           <TypedInput
             className="col-auto"
             disabled={disabled}

@@ -2,6 +2,7 @@
   "compilerOptions": {
     /* Basic/Project Options */
     // "baseUrl": "app",
+    "baseUrl": "app",
     "target": "ESNext",
     "module": "CommonJS",
     "outDir": "./dist/",
@@ -20,7 +21,8 @@
     "noImplicitReturns": true,
     "types": ["jest", "node", "react"],
     "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true
   },
   /* File Inclusion */
   "include": ["app/**/*"],
