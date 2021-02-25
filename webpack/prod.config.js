@@ -16,10 +16,10 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css'
     }),
-    new CompressionPlugin({
-      deleteOriginalAssets: true,
-      test: /\.js$|\.css$|\.html$/
-    }),
+    // new CompressionPlugin({
+    //   deleteOriginalAssets: true,
+    //   test: /\.js$|\.css$|\.html$/
+    // }),
     new DuplicatePackageCheckerPlugin()
   ],
   performance: {
