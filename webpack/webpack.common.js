@@ -27,6 +27,9 @@ module.exports = {
 
   // Customize the webpack build process
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process'
+    }),
     new StyleLintPlugin({
       fix: true
     }),
@@ -94,6 +97,8 @@ module.exports = {
   // https://github.com/webpack/webpack/blob/master/lib/ModuleNotFoundError.js
   resolve: {
     alias: {
+      assert: require.resolve('assert/'),
+      process: require.resolve('process/browser'),
       util: require.resolve('util/')
     },
     extensions: ['.tsx', '.ts', '.js', '.json']
