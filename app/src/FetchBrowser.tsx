@@ -34,6 +34,7 @@ type treeItem = {
   fetchOnly?: boolean
   isOpen: boolean
   items: treeItems
+  originalPath: string
 }
 
 export type treeItems = Array<treeItem>
@@ -58,7 +59,7 @@ export const adaptValue = (
     }
     content = fields.map((field) => {
       return flat && flat[field] !== undefined ? (
-        <span className="State-field mr-1" key={field}>
+        <span className="State-field me-1" key={field}>
           {field}:{JSON.stringify(flat[field])}
         </span>
       ) : null
@@ -105,7 +106,8 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
         const isFavorite = favorites.indexOf(item.path) !== -1
         const isFilterTerm = !!props.filterTerm
         const isOpen = item.isOpen || isFilterTerm || props.showFavorites
-        const isMethod = !hasChild && typeof item.value === 'undefined'
+        const isValue = typeof item.value !== 'undefined'
+        const isStateMethod = path === item.originalPath
 
         let isVisible =
           !props.filterTerm ||
@@ -133,17 +135,15 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                     'list-group-item-action': hasChild
                   }
                 )}
-                onClick={(): void => {
-                  if (hasChild && !isFilterTerm) {
-                    setTreeData((items) => toggleTreeOpen(items, path))
-                  }
-                }}
               >
                 <div className="col-auto" style={{ minWidth: 38 }}>
                   {hasChild && !isFilterTerm ? (
                     <span
-                      className="badge bg-bg-transparent text-secondary mr-1"
+                      className="badge bg-bg-transparent text-secondary me-1"
                       style={{ minWidth: 24 }}
+                      onClick={(): void => {
+                        setTreeData((items) => toggleTreeOpen(items, path))
+                      }}
                     >
                       {item.isOpen ? <RemoveCircle /> : <AddCircle />}
                     </span>
@@ -152,37 +152,40 @@ const FetchRows = (props: AddFetchRowProps): JSX.Element => {
                 <div className="col">
                   <div className="font-weight-bold d-inline">{item.path}</div>
                   <samp
-                    className="font-monospace font-weight-lighter text-wrap d-inline"
+                    className="font-monospace font-weight-lighter text-wrap d-block"
                     style={{ fontSize: '0.8rem' }}
                   >
                     {item.value && adaptValue(item.value)}
                   </samp>
                 </div>
                 <div className="col-auto">
+                  {isStateMethod ? (
+                    isValue ? (
+                      <span
+                        className="badge bg-info bg-gradient"
+                        style={{ minWidth: 24 }}
+                        title="State"
+                      >
+                        S
+                      </span>
+                    ) : (
+                      <span
+                        className="badge bg-warning bg-gradient"
+                        style={{ minWidth: 24 }}
+                        title="Method"
+                      >
+                        M
+                      </span>
+                    )
+                  ) : null}
                   {hasChild ? (
-                    <span className="badge bg-secondary rounded-pill">
+                    <span className="ms-1 badge bg-secondary rounded-pill">
                       {count}
                     </span>
-                  ) : isMethod ? (
-                    <span
-                      className="badge bg-warning bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="Method"
-                    >
-                      M
-                    </span>
-                  ) : (
-                    <span
-                      className="badge bg-info bg-gradient"
-                      style={{ minWidth: 24 }}
-                      title="State"
-                    >
-                      S
-                    </span>
-                  )}
+                  ) : null}
                   {hasChild ? null : (
                     <span
-                      className="ml-1"
+                      className="ms-1"
                       onClick={(
                         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
                       ): void => {
@@ -262,6 +265,7 @@ const addData = (
       if (depth === 1) {
         _last.push({
           path: currPath,
+          originalPath: _data.path,
           label: part,
           value: _data.value,
           fetchOnly: _data.fetchOnly,
@@ -271,7 +275,9 @@ const addData = (
       } else {
         _last.push({
           path: currPath,
+          originalPath: _data.path,
           label: part,
+          value: currPath === _data.path ? _data.value : undefined,
           fetchOnly: _data.fetchOnly,
           isOpen: false,
           items: []
@@ -283,23 +289,17 @@ const addData = (
   return _last
 }
 
-const findPath = (
-  path: string,
-  index: number,
-  treeData: treeItems
-): treeItem | null => {
-  const parts = path.split('/')
-  if (parts[0] === '') {
-    parts.shift()
-    parts[0] = `/${parts[0]}`
-  }
-  const it = parts.filter((_, i) => i <= index)
-  const findItem = treeData.find((item) => item.path === it.join('/'))
-  if (findItem && path === findItem.path && findItem.items.length === 0) {
+const findPath = (path: string, treeData: treeItems): treeItem | null => {
+  const findItem = treeData.find((item) => item.path === path)
+  if (findItem && path === findItem.originalPath) {
     return findItem
   }
-  if (findItem) {
-    return findPath(path, index + 1, findItem.items)
+  for (let index = 0; index < treeData.length; index++) {
+    const element = treeData[index]
+    const find = findPath(path, element.items)
+    if (find) {
+      return find
+    }
   }
   return null
 }
@@ -392,7 +392,7 @@ export const FetchBrowser = (): JSX.Element => {
                 />
               </div>
               <button
-                className="btn btn-outline-secondary text-nowrap ml-2"
+                className="btn btn-outline-secondary text-nowrap ms-2"
                 type="button"
                 onClick={toggleShowFavorites}
                 disabled={treeData.length === 0}
@@ -426,7 +426,6 @@ export const FetchBrowser = (): JSX.Element => {
           if (match && match.params.path) {
             const stateOrMethod = findPath(
               decodeURIComponent(match.params.path),
-              0,
               treeData
             )
             if (stateOrMethod) {

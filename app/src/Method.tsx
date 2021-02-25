@@ -58,7 +58,7 @@ const Method = (props: MethodProps): JSX.Element => {
           <label htmlFor="inputArguments" className="form-label">
             Arguments
           </label>
-          <div className="input-group mb-3">
+          <div className="input-group mb-2">
             <span className="input-group-text">[</span>
             <input
               type="text"
