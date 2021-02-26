@@ -47,7 +47,8 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
   }, [JSON.stringify(ctx.peer)])
 
   const onProtocol = (ev: React.ChangeEvent<HTMLSelectElement>) => {
-    setProtocol(ev.currentTarget.value as wsSheme)
+    const scheme = ev.currentTarget.value as wsSheme
+    setProtocol(scheme)
   }
 
   const onConnect = (): void => {
@@ -98,7 +99,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                 onChange={(ev) => {
                   setName(ev.currentTarget.value)
                 }}
-                defaultValue={name}
+                value={name}
                 disabled={isConnected}
               />
             </div>
@@ -119,7 +120,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                     name="protocol"
                     className="form-select"
                     onChange={onProtocol}
-                    defaultValue={protocol}
+                    value={protocol}
                     disabled={isConnected}
                   >
                     <option value="ws">ws</option>
@@ -142,7 +143,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                         error
                       })
                     }}
-                    defaultValue={url.value}
+                    value={url.value}
                     required
                     disabled={isConnected}
                   />
@@ -165,7 +166,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                   onChange={(ev) => {
                     setUser(ev.currentTarget.value)
                   }}
-                  defaultValue={user}
+                  value={user}
                   disabled={isConnected}
                 />
               </div>
@@ -182,7 +183,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
                   onChange={(ev) => {
                     setPassword(ev.currentTarget.value)
                   }}
-                  defaultValue={password}
+                  value={password}
                   disabled={isConnected}
                 />
               </div>
