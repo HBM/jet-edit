@@ -68,7 +68,7 @@ const TableRow = (): JSX.Element => {
             <td>
               <button
                 type="button"
-                className="btn btn-sm float-right"
+                className="btn btn-sm float-end"
                 title="remove connection"
                 onClick={(
                   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -115,7 +115,7 @@ export const Connections = (): JSX.Element => {
               <h5 className="d-inline-block">{title}</h5>
               <button
                 type="button"
-                className="btn btn-sm float-right"
+                className="btn btn-sm float-end"
                 title="add new connection"
                 onClick={addConnection}
               >

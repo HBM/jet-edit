@@ -129,7 +129,7 @@ const State = (props: StateProps): JSX.Element => {
         <span>{props.path}</span>
         <Link
           to={props.backUrl}
-          className="float-right d-lg-none"
+          className="float-end d-lg-none"
           aria-label="Close"
         >
           <Close width={30} height={30} />

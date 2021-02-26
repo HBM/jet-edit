@@ -72,7 +72,7 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
           <span>Connection #{displayIndex}</span>
           <Link
             to="/connections/all"
-            className="float-right d-lg-none"
+            className="float-end d-lg-none"
             aria-label="Close"
           >
             <Close width={30} height={30} />
@@ -190,14 +190,14 @@ export const Connection = (props: ConnectionProps): JSX.Element => {
             </div>
             {isConnected ? (
               <button
-                className="btn btn-warning float-right"
+                className="btn btn-warning float-end"
                 onClick={onDisconnect}
               >
                 Disconnect
               </button>
             ) : (
               <button
-                className="btn btn-primary float-right"
+                className="btn btn-primary float-end"
                 disabled={url.error}
                 onClick={onConnect}
               >

@@ -21,10 +21,10 @@ module.exports = merge(common, {
     hot: true
   },
 
-  // plugins: [
-  //   // Only update what has changed on hot reload
-  //   new webpack.HotModuleReplacementPlugin()
-  // ],
+  plugins: [
+    // Only update what has changed on hot reload
+    new webpack.HotModuleReplacementPlugin()
+  ],
   performance: {
     hints: false
   },
